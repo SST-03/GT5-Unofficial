@@ -632,7 +632,7 @@ public class MachineBlockRenderer extends GTRendererBlock {
 
     @Override
     public void renderInventoryBlock(Block aBlock, int aMeta, int aModelID, RenderBlocks aRenderer) {
-        final SBRInventoryContext ctx = sbrContextHolder.getSBRInventoryContext(aBlock, aMeta, aModelID, aRenderer);
+        final SBRInventoryContext ctx = inventoryContext.setup(aBlock, aMeta, aModelID, aRenderer);
         aMeta += 30400;
         if (aBlock instanceof BlockMachines) {
             if (aMeta > 0 && aMeta < GregTechAPI.METATILEENTITIES.length
@@ -650,7 +650,7 @@ public class MachineBlockRenderer extends GTRendererBlock {
     public boolean renderWorldBlock(IBlockAccess aWorld, int aX, int aY, int aZ, Block aBlock, int aModelID,
         RenderBlocks aRenderer) {
         final TesselatorAccessor tessAccess = (TesselatorAccessor) Tessellator.instance;
-        final SBRWorldContext ctx = sbrContextHolder.getSBRWorldContext(aX, aY, aZ, aBlock, aModelID, aRenderer);
+        final SBRWorldContext ctx = worldContext.setup(aX, aY, aZ, aBlock, aModelID, aRenderer);
 
         TileEntity aTileEntity = aWorld.getTileEntity(aX, aY, aZ);
         return aTileEntity != null && (aTileEntity instanceof IGregTechTileEntity

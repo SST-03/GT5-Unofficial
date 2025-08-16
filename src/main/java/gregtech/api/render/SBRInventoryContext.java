@@ -38,13 +38,6 @@ public final class SBRInventoryContext extends SBRContextBase {
     private int meta;
 
     /**
-     * Package-private constructor.
-     * <p>
-     * Instances should be obtained via {@link SBRContextHolder#getSBRInventoryContext}.
-     */
-    SBRInventoryContext() {}
-
-    /**
      * Configures this {@link SBRInventoryContext} to render a single {@link Block}
      * inside an inventory, using the given parameters.
      *
@@ -54,7 +47,7 @@ public final class SBRInventoryContext extends SBRContextBase {
      * @param renderer the {@link RenderBlocks} renderer to use
      * @return this context instance, configured with the given parameters
      */
-    SBRInventoryContext setup(@NotNull Block block, int meta, int modelId, @NotNull RenderBlocks renderer) {
+    public SBRInventoryContext setup(@NotNull Block block, int meta, int modelId, @NotNull RenderBlocks renderer) {
         super.setup(block, modelId, renderer);
         this.meta = meta;
         reset();

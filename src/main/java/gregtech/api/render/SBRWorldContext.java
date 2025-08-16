@@ -89,13 +89,6 @@ public final class SBRWorldContext extends SBRContextBase {
     private float aoTopLeft, aoBottomLeft, aoBottomRight, aoTopRight;
 
     /**
-     * Package-private constructor.
-     * <p>
-     * Instances should be obtained via {@link SBRContextHolder#getSBRWorldContext}.
-     */
-    SBRWorldContext() {}
-
-    /**
      * Gets mixed ambient occlusion value from two inputs, with a ratio applied to the final result.
      *
      * @param ao1   the first ambient occlusion value
@@ -123,7 +116,7 @@ public final class SBRWorldContext extends SBRContextBase {
      */
     @SuppressWarnings("MethodWithTooManyParameters")
     // Blame ISimpleBlockRenderingHandler.renderWorldBlock
-    SBRWorldContext setup(int x, int y, int z, Block block, int modelId, RenderBlocks renderBlocks) {
+    public SBRWorldContext setup(int x, int y, int z, Block block, int modelId, RenderBlocks renderBlocks) {
         super.setup(block, modelId, renderBlocks);
         this.blockAccess = renderBlocks.blockAccess;
         this.worldRenderPass = ForgeHooksClient.getWorldRenderPass();

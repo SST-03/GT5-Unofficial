@@ -50,7 +50,6 @@ import gregtech.api.interfaces.tileentity.ITexturedTileEntity;
 import gregtech.api.metatileentity.MetaPipeEntity;
 import gregtech.api.objects.XSTR;
 import gregtech.api.render.RenderOverlay;
-import gregtech.api.render.SBRContextHolder;
 import gregtech.api.render.SBRInventoryContext;
 import gregtech.api.render.SBRWorldContext;
 import gregtech.common.blocks.BlockFrameBox;
@@ -80,8 +79,8 @@ public class GTRendererBlock implements ISimpleBlockRenderingHandler {
 
     private final ITexture[][] textureArray = new ITexture[6][];
     private final ITexture[] overlayHolder = new ITexture[1];
-
-    protected final SBRContextHolder sbrContextHolder = new SBRContextHolder();
+    protected final SBRInventoryContext inventoryContext = new SBRInventoryContext();
+    protected final SBRWorldContext worldContext = new SBRWorldContext();
 
     public boolean renderStandardBlock(SBRWorldContext ctx) {
         final TileEntity tTileEntity = ctx.getTileEntity();
@@ -590,7 +589,7 @@ public class GTRendererBlock implements ISimpleBlockRenderingHandler {
 
     @Override
     public void renderInventoryBlock(Block aBlock, int aMeta, int aModelID, RenderBlocks aRenderer) {
-        final SBRInventoryContext ctx = sbrContextHolder.getSBRInventoryContext(aBlock, aMeta, aModelID, aRenderer);
+        final SBRInventoryContext ctx = inventoryContext.setup(aBlock, aMeta, aModelID, aRenderer);
         aRenderer.enableAO = false;
         aRenderer.useInventoryTint = true;
 
@@ -692,7 +691,7 @@ public class GTRendererBlock implements ISimpleBlockRenderingHandler {
     @Override
     public boolean renderWorldBlock(IBlockAccess aWorld, int aX, int aY, int aZ, Block aBlock, int aModelID,
         RenderBlocks aRenderer) {
-        final SBRWorldContext ctx = sbrContextHolder.getSBRWorldContext(aX, aY, aZ, aBlock, aModelID, aRenderer);
+        final SBRWorldContext ctx = worldContext.setup(aX, aY, aZ, aBlock, aModelID, aRenderer);
 
         final TileEntity tileEntity = ctx.getTileEntity();
         final TesselatorAccessor tessAccess = (TesselatorAccessor) Tessellator.instance;
