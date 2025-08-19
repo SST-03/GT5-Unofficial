@@ -1,47 +1,57 @@
 package gregtech.common.tileentities.machines.multi.processing;
 
-import static com.gtnewhorizon.structurelib.structure.StructureUtility.ofBlock;
 import static com.gtnewhorizon.structurelib.structure.StructureUtility.onElementPass;
 import static gregtech.api.enums.HatchElement.Energy;
 import static gregtech.api.enums.HatchElement.InputBus;
 import static gregtech.api.enums.HatchElement.InputHatch;
 import static gregtech.api.enums.HatchElement.Maintenance;
+import static gregtech.api.enums.HatchElement.Muffler;
 import static gregtech.api.enums.HatchElement.OutputBus;
 import static gregtech.api.enums.HatchElement.OutputHatch;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY_ACTIVE;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY_ACTIVE_GLOW;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY_GLOW;
+import static gregtech.api.enums.Textures.BlockIcons.LARGETURBINE_NEW5;
+import static gregtech.api.enums.Textures.BlockIcons.LARGETURBINE_NEW_ACTIVE5;
 import static gregtech.api.util.GTStructureUtility.buildHatchAdder;
 import static gregtech.api.util.GTStructureUtility.chainAllGlasses;
 import static gregtech.api.util.GTStructureUtility.ofFrame;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.gtnewhorizon.structurelib.alignment.constructable.ISurvivalConstructable;
+import com.gtnewhorizon.structurelib.alignment.enumerable.ExtendedFacing;
 import com.gtnewhorizon.structurelib.structure.IStructureDefinition;
 import com.gtnewhorizon.structurelib.structure.ISurvivalBuildEnvironment;
 import com.gtnewhorizon.structurelib.structure.StructureDefinition;
 
-import gregtech.api.GregTechAPI;
+import gregtech.api.casing.Casings;
 import gregtech.api.enums.Materials;
 import gregtech.api.enums.Textures;
+import gregtech.api.interfaces.IIconContainer;
+import gregtech.api.interfaces.INEIPreviewModifier;
 import gregtech.api.interfaces.ITexture;
 import gregtech.api.interfaces.metatileentity.IMetaTileEntity;
 import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
 import gregtech.api.logic.ProcessingLogic;
 import gregtech.api.metatileentity.implementations.MTEExtendedPowerMultiBlockBase;
 import gregtech.api.recipe.RecipeMap;
-import gregtech.api.recipe.RecipeMaps;
+import gregtech.api.render.RenderOverlay;
 import gregtech.api.render.TextureFactory;
 import gregtech.api.util.GTUtility;
+import gregtech.api.util.GTUtilityClient;
 import gregtech.api.util.MultiblockTooltipBuilder;
-import gregtech.common.blocks.BlockCasings10;
 import gregtech.common.misc.GTStructureChannels;
+import gregtech.common.pollution.PollutionConfig;
+import gtPlusPlus.api.recipe.GTPPRecipeMaps;
 
 public class MTEIndustrialCentrifugeModern extends MTEExtendedPowerMultiBlockBase<MTEIndustrialCentrifugeModern>
-    implements ISurvivalConstructable {
+    implements ISurvivalConstructable, INEIPreviewModifier {
 
     private static final String STRUCTURE_PIECE_MAIN = "main";
     private static final IStructureDefinition<MTEIndustrialCentrifugeModern> STRUCTURE_DEFINITION = StructureDefinition
@@ -72,16 +82,19 @@ public class MTEIndustrialCentrifugeModern extends MTEExtendedPowerMultiBlockBas
         .addElement(
             'B',
             buildHatchAdder(MTEIndustrialCentrifugeModern.class)
-                .atLeast(InputBus, OutputBus, InputHatch, OutputHatch, Maintenance, Energy)
-                .casingIndex(((BlockCasings10) GregTechAPI.sBlockCasings10).getTextureIndex(15))
+                .atLeast(InputBus, OutputBus, InputHatch, OutputHatch, Maintenance, Energy, Muffler)
+                .casingIndex(Casings.CentrifugeCasing.textureId)
                 .dot(1)
                 .buildAndChain(
-                    onElementPass(
-                        MTEIndustrialCentrifugeModern::onCasingAdded,
-                        ofBlock(GregTechAPI.sBlockCasings10, 15))))
+                    onElementPass(MTEIndustrialCentrifugeModern::onCasingAdded, Casings.CentrifugeCasing.asElement())))
         .addElement('A', chainAllGlasses())
         .addElement('C', ofFrame(Materials.Steel))
         .build();
+
+    private int mCasingAmount;
+    private boolean mIsAnimated = true;
+    private final List<RenderOverlay.OverlayTicket> overlayTickets = new ArrayList<>();
+    private boolean mFormed;
 
     public MTEIndustrialCentrifugeModern(final int aID, final String aName, final String aNameRegional) {
         super(aID, aName, aNameRegional);
@@ -106,36 +119,19 @@ public class MTEIndustrialCentrifugeModern extends MTEExtendedPowerMultiBlockBas
         int colorIndex, boolean aActive, boolean redstoneLevel) {
         ITexture[] rTexture;
         if (side == aFacing) {
-            if (aActive) {
-                rTexture = new ITexture[] {
-                    Textures.BlockIcons
-                        .getCasingTextureForId(GTUtility.getCasingTextureIndex(GregTechAPI.sBlockCasings10, 15)),
-                    TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY_ACTIVE)
-                        .extFacing()
-                        .build(),
-                    TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY_ACTIVE_GLOW)
-                        .extFacing()
-                        .glow()
-                        .build() };
+            if (aActive && mIsAnimated) {
+                rTexture = new ITexture[] { Casings.CentrifugeCasing.getCasingTexture(), TextureFactory.builder()
+                    .addIcon(LARGETURBINE_NEW_ACTIVE5)
+                    .extFacing()
+                    .build() };
             } else {
-                rTexture = new ITexture[] {
-                    Textures.BlockIcons
-                        .getCasingTextureForId(GTUtility.getCasingTextureIndex(GregTechAPI.sBlockCasings10, 15)),
-                    TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY)
-                        .extFacing()
-                        .build(),
-                    TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY_GLOW)
-                        .extFacing()
-                        .glow()
-                        .build() };
+                rTexture = new ITexture[] { Casings.CentrifugeCasing.getCasingTexture(), TextureFactory.builder()
+                    .addIcon(LARGETURBINE_NEW5)
+                    .extFacing()
+                    .build() };
             }
         } else {
-            rTexture = new ITexture[] { Textures.BlockIcons
-                .getCasingTextureForId(GTUtility.getCasingTextureIndex(GregTechAPI.sBlockCasings10, 15)) };
+            rTexture = new ITexture[] { Casings.CentrifugeCasing.getCasingTexture() };
         }
         return rTexture;
     }
@@ -143,9 +139,12 @@ public class MTEIndustrialCentrifugeModern extends MTEExtendedPowerMultiBlockBas
     @Override
     protected MultiblockTooltipBuilder createTooltip() {
         MultiblockTooltipBuilder tt = new MultiblockTooltipBuilder();
-        tt.addMachineType("Brewery")
-            .addInfo("50% faster than singleblock machines of the same voltage")
-            .addInfo("Gains 4 parallels per voltage tier")
+        tt.addMachineType("Centrifuge")
+            .addInfo("125% faster than single block machines of the same voltage")
+            .addInfo("Disable animations with a screwdriver")
+            .addInfo("Only uses 90% of the EU/t normally required")
+            .addInfo("Processes six items per voltage tier")
+            .addPollutionAmount(PollutionConfig.pollutionPerSecondMultiIndustrialCentrifuge)
             .beginStructureBlock(3, 5, 3, true)
             .addController("Front Center")
             .addCasingInfoMin("Reinforced Wooden Casing", 14, false)
@@ -157,6 +156,7 @@ public class MTEIndustrialCentrifugeModern extends MTEExtendedPowerMultiBlockBas
             .addOutputHatch("Any Wooden Casing", 1)
             .addEnergyHatch("Any Wooden Casing", 1)
             .addMaintenanceHatch("Any Wooden Casing", 1)
+            .addMufflerHatch("Any Wooden Casing", 1)
             .addSubChannelUsage(GTStructureChannels.BOROGLASS)
             .toolTipFinisher();
         return tt;
@@ -173,8 +173,6 @@ public class MTEIndustrialCentrifugeModern extends MTEExtendedPowerMultiBlockBas
         return survivalBuildPiece(STRUCTURE_PIECE_MAIN, stackSize, 1, 2, 0, elementBudget, env, false, true);
     }
 
-    private int mCasingAmount;
-
     private void onCasingAdded() {
         mCasingAmount++;
     }
@@ -182,23 +180,28 @@ public class MTEIndustrialCentrifugeModern extends MTEExtendedPowerMultiBlockBas
     @Override
     public boolean checkMachine(IGregTechTileEntity aBaseMetaTileEntity, ItemStack aStack) {
         mCasingAmount = 0;
-        return checkPiece(STRUCTURE_PIECE_MAIN, 1, 2, 0) && mCasingAmount >= 14;
+        checkPiece(STRUCTURE_PIECE_MAIN, 1, 2, 0);
+        if (mMaintenanceHatches.isEmpty()) return false;
+        if (mCasingAmount < 14) return false;
+        return true;
     }
 
     @Override
     protected ProcessingLogic createProcessingLogic() {
-        return new ProcessingLogic().setSpeedBonus(1F / 1.5F)
+        return new ProcessingLogic().noRecipeCaching()
+            .setEuModifier(0.9F)
+            .setSpeedBonus(1F / 2.25F)
             .setMaxParallelSupplier(this::getTrueParallel);
     }
 
     @Override
     public int getMaxParallelRecipes() {
-        return (4 * GTUtility.getTier(this.getMaxInputVoltage()));
+        return (6 * GTUtility.getTier(this.getMaxInputVoltage()));
     }
 
     @Override
     public RecipeMap<?> getRecipeMap() {
-        return RecipeMaps.brewingRecipes;
+        return GTPPRecipeMaps.centrifugeNonCellRecipes;
     }
 
     @Override
@@ -219,5 +222,101 @@ public class MTEIndustrialCentrifugeModern extends MTEExtendedPowerMultiBlockBas
     @Override
     public boolean supportsSingleRecipeLocking() {
         return true;
+    }
+
+    @Override
+    public int getPollutionPerSecond(ItemStack aStack) {
+        return PollutionConfig.pollutionPerSecondMultiIndustrialCentrifuge;
+    }
+
+    public boolean usingAnimations() {
+        return mIsAnimated;
+    }
+
+    @Override
+    public final void onScrewdriverRightClick(ForgeDirection side, EntityPlayer aPlayer, float aX, float aY, float aZ,
+        ItemStack aTool) {
+        super.onScrewdriverRightClick(side, aPlayer, aX, aY, aZ, aTool);
+        this.mIsAnimated = !mIsAnimated;
+        if (this.mIsAnimated) {
+            GTUtility.sendChatToPlayer(aPlayer, "Using Animated Turbine Texture. ");
+        } else {
+            GTUtility.sendChatToPlayer(aPlayer, "Using Static Turbine Texture. ");
+        }
+        setTurbineOverlay();
+    }
+
+    @Override
+    public void saveNBTData(NBTTagCompound aNBT) {
+        super.saveNBTData(aNBT);
+        aNBT.setBoolean("mIsAnimated", mIsAnimated);
+    }
+
+    @Override
+    public void loadNBTData(NBTTagCompound aNBT) {
+        super.loadNBTData(aNBT);
+        if (aNBT.hasKey("mIsAnimated")) {
+            mIsAnimated = aNBT.getBoolean("mIsAnimated");
+        }
+    }
+
+    @Override
+    public void onFirstTick(IGregTechTileEntity aBaseMetaTileEntity) {
+        super.onFirstTick(aBaseMetaTileEntity);
+        setTurbineOverlay();
+    }
+
+    @Override
+    public void setExtendedFacing(ExtendedFacing newExtendedFacing) {
+        boolean extendedFacingChanged = newExtendedFacing != getExtendedFacing();
+        super.setExtendedFacing(newExtendedFacing);
+        if (extendedFacingChanged) {
+            setTurbineOverlay();
+        }
+    }
+
+    @Override
+    public void onTextureUpdate() {
+        setTurbineOverlay();
+    }
+
+    protected void setTurbineOverlay() {
+        IGregTechTileEntity tile = getBaseMetaTileEntity();
+        if (tile.isServerSide()) return;
+
+        IIconContainer[] tTextures;
+        if (getBaseMetaTileEntity().isActive() && usingAnimations()) tTextures = Textures.BlockIcons.TURBINE_NEW_ACTIVE;
+        else tTextures = Textures.BlockIcons.TURBINE_NEW;
+
+        GTUtilityClient.setTurbineOverlay(
+            tile.getWorld(),
+            tile.getXCoord(),
+            tile.getYCoord(),
+            tile.getZCoord(),
+            getExtendedFacing(),
+            tTextures,
+            overlayTickets);
+    }
+
+    @Override
+    public void onRemoval() {
+        super.onRemoval();
+        if (getBaseMetaTileEntity().isClientSide()) GTUtilityClient.clearTurbineOverlay(overlayTickets);
+    }
+
+    @Override
+    public void onValueUpdate(byte aValue) {
+        mFormed = (aValue & 0x1) != 0;
+        setTurbineOverlay();
+    }
+
+    @Override
+    public byte getUpdateData() {
+        return (byte) ((mMachine ? 1 : 0));
+    }
+
+    @Override
+    public void onPreviewStructureComplete(@NotNull ItemStack trigger) {
+        mFormed = true;
     }
 }

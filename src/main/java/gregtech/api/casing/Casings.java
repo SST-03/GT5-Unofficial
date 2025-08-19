@@ -261,6 +261,9 @@ public enum Casings implements ICasing {
     AdvancedFusionCoilII
         (() -> ModBlocks.blockCasings6Misc, 1, gtpp(3, 5)),
 
+    CentrifugeCasing
+        (() -> ModBlocks.blockCasingsMisc, 0, gtpp(0, 0)),
+
     MagicCasing
         (() -> Loaders.magicCasing, 0, -1),
 
