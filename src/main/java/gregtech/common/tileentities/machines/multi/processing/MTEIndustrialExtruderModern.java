@@ -1,20 +1,20 @@
 package gregtech.common.tileentities.machines.multi.processing;
 
-import static com.gtnewhorizon.structurelib.structure.StructureUtility.ofBlock;
 import static com.gtnewhorizon.structurelib.structure.StructureUtility.onElementPass;
 import static gregtech.api.enums.HatchElement.Energy;
 import static gregtech.api.enums.HatchElement.InputBus;
 import static gregtech.api.enums.HatchElement.InputHatch;
 import static gregtech.api.enums.HatchElement.Maintenance;
+import static gregtech.api.enums.HatchElement.Muffler;
 import static gregtech.api.enums.HatchElement.OutputBus;
 import static gregtech.api.enums.HatchElement.OutputHatch;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY_ACTIVE;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY_ACTIVE_GLOW;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY_GLOW;
 import static gregtech.api.util.GTStructureUtility.buildHatchAdder;
 import static gregtech.api.util.GTStructureUtility.chainAllGlasses;
 import static gregtech.api.util.GTStructureUtility.ofFrame;
+import static gtPlusPlus.xmod.gregtech.common.blocks.textures.TexturesGtBlock.oMCDIndustrialExtruder;
+import static gtPlusPlus.xmod.gregtech.common.blocks.textures.TexturesGtBlock.oMCDIndustrialExtruderActive;
+import static gtPlusPlus.xmod.gregtech.common.blocks.textures.TexturesGtBlock.oMCDIndustrialExtruderActiveGlow;
+import static gtPlusPlus.xmod.gregtech.common.blocks.textures.TexturesGtBlock.oMCDIndustrialExtruderGlow;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -24,9 +24,9 @@ import com.gtnewhorizon.structurelib.structure.IStructureDefinition;
 import com.gtnewhorizon.structurelib.structure.ISurvivalBuildEnvironment;
 import com.gtnewhorizon.structurelib.structure.StructureDefinition;
 
-import gregtech.api.GregTechAPI;
+import gregtech.api.casing.Casings;
 import gregtech.api.enums.Materials;
-import gregtech.api.enums.Textures;
+import gregtech.api.enums.SoundResource;
 import gregtech.api.interfaces.ITexture;
 import gregtech.api.interfaces.metatileentity.IMetaTileEntity;
 import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
@@ -37,8 +37,8 @@ import gregtech.api.recipe.RecipeMaps;
 import gregtech.api.render.TextureFactory;
 import gregtech.api.util.GTUtility;
 import gregtech.api.util.MultiblockTooltipBuilder;
-import gregtech.common.blocks.BlockCasings10;
 import gregtech.common.misc.GTStructureChannels;
+import gregtech.common.pollution.PollutionConfig;
 
 public class MTEIndustrialExtruderModern extends MTEExtendedPowerMultiBlockBase<MTEIndustrialExtruderModern>
     implements ISurvivalConstructable {
@@ -48,40 +48,21 @@ public class MTEIndustrialExtruderModern extends MTEExtendedPowerMultiBlockBase<
         .<MTEIndustrialExtruderModern>builder()
         .addShape(
             STRUCTURE_PIECE_MAIN,
-            // spotless:off
-            new String[][]{{
-                "BBB",
-                "BBB",
-                "B~B",
-                "BBB",
-                "C C"
-            },{
-                "BBB",
-                "A A",
-                "A A",
-                "BBB",
-                "   "
-            },{
-                "BBB",
-                "BAB",
-                "BAB",
-                "BBB",
-                "C C"
-            }})
-        //spotless:on
+            new String[][] { { "BBB", "BBB", "B~B", "BBB", "C C" }, { "BBB", "A A", "A A", "BBB", "   " },
+                { "BBB", "BAB", "BAB", "BBB", "C C" } })
         .addElement(
             'B',
             buildHatchAdder(MTEIndustrialExtruderModern.class)
-                .atLeast(InputBus, OutputBus, InputHatch, OutputHatch, Maintenance, Energy)
-                .casingIndex(((BlockCasings10) GregTechAPI.sBlockCasings10).getTextureIndex(15))
+                .atLeast(InputBus, OutputBus, InputHatch, OutputHatch, Maintenance, Energy, Muffler)
+                .casingIndex(Casings.ExtruderCasing.textureId)
                 .dot(1)
                 .buildAndChain(
-                    onElementPass(
-                        MTEIndustrialExtruderModern::onCasingAdded,
-                        ofBlock(GregTechAPI.sBlockCasings10, 15))))
+                    onElementPass(MTEIndustrialExtruderModern::onCasingAdded, Casings.ExtruderCasing.asElement())))
         .addElement('A', chainAllGlasses())
         .addElement('C', ofFrame(Materials.Steel))
         .build();
+
+    private int mCasingAmount;
 
     public MTEIndustrialExtruderModern(final int aID, final String aName, final String aNameRegional) {
         super(aID, aName, aNameRegional);
@@ -107,35 +88,28 @@ public class MTEIndustrialExtruderModern extends MTEExtendedPowerMultiBlockBase<
         ITexture[] rTexture;
         if (side == aFacing) {
             if (aActive) {
-                rTexture = new ITexture[] {
-                    Textures.BlockIcons
-                        .getCasingTextureForId(GTUtility.getCasingTextureIndex(GregTechAPI.sBlockCasings10, 15)),
+                rTexture = new ITexture[] { Casings.ExtruderCasing.getCasingTexture(), TextureFactory.builder()
+                    .addIcon(oMCDIndustrialExtruderActive)
+                    .extFacing()
+                    .build(),
                     TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY_ACTIVE)
-                        .extFacing()
-                        .build(),
-                    TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY_ACTIVE_GLOW)
+                        .addIcon(oMCDIndustrialExtruderActiveGlow)
                         .extFacing()
                         .glow()
                         .build() };
             } else {
-                rTexture = new ITexture[] {
-                    Textures.BlockIcons
-                        .getCasingTextureForId(GTUtility.getCasingTextureIndex(GregTechAPI.sBlockCasings10, 15)),
+                rTexture = new ITexture[] { Casings.ExtruderCasing.getCasingTexture(), TextureFactory.builder()
+                    .addIcon(oMCDIndustrialExtruder)
+                    .extFacing()
+                    .build(),
                     TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY)
-                        .extFacing()
-                        .build(),
-                    TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY_GLOW)
+                        .addIcon(oMCDIndustrialExtruderGlow)
                         .extFacing()
                         .glow()
                         .build() };
             }
         } else {
-            rTexture = new ITexture[] { Textures.BlockIcons
-                .getCasingTextureForId(GTUtility.getCasingTextureIndex(GregTechAPI.sBlockCasings10, 15)) };
+            rTexture = new ITexture[] { Casings.ExtruderCasing.getCasingTexture() };
         }
         return rTexture;
     }
@@ -143,20 +117,25 @@ public class MTEIndustrialExtruderModern extends MTEExtendedPowerMultiBlockBase<
     @Override
     protected MultiblockTooltipBuilder createTooltip() {
         MultiblockTooltipBuilder tt = new MultiblockTooltipBuilder();
-        tt.addMachineType("Brewery")
-            .addInfo("50% faster than singleblock machines of the same voltage")
-            .addInfo("Gains 4 parallels per voltage tier")
+        tt.addMachineType("Extruder, IEM")
+            .addInfo("250% faster than single block machines of the same voltage")
+            .addInfo("Processes four items per voltage tier")
+            .addInfo("Extrusion Shape for recipe goes in the Input Bus")
+            .addInfo("Each Input Bus can have a different shape!")
+            .addInfo("You can use several input buses per multiblock")
+            .addPollutionAmount(PollutionConfig.pollutionPerSecondMultiIndustrialExtruder)
             .beginStructureBlock(3, 5, 3, true)
             .addController("Front Center")
-            .addCasingInfoMin("Reinforced Wooden Casing", 14, false)
+            .addCasingInfoMin("Inconel Reinforced Casings", 14, false)
             .addCasingInfoExactly("Any Tiered Glass", 6, false)
             .addCasingInfoExactly("Steel Frame Box", 4, false)
-            .addInputBus("Any Wooden Casing", 1)
-            .addOutputBus("Any Wooden Casing", 1)
-            .addInputHatch("Any Wooden Casing", 1)
-            .addOutputHatch("Any Wooden Casing", 1)
-            .addEnergyHatch("Any Wooden Casing", 1)
-            .addMaintenanceHatch("Any Wooden Casing", 1)
+            .addInputBus("Any Casing", 1)
+            .addOutputBus("Any Casing", 1)
+            .addInputHatch("Any Casing", 1)
+            .addOutputHatch("Any Casing", 1)
+            .addEnergyHatch("Any Casing", 1)
+            .addMaintenanceHatch("Any Casing", 1)
+            .addMufflerHatch("Any Casing", 1)
             .addSubChannelUsage(GTStructureChannels.BOROGLASS)
             .toolTipFinisher();
         return tt;
@@ -173,8 +152,6 @@ public class MTEIndustrialExtruderModern extends MTEExtendedPowerMultiBlockBase<
         return survivalBuildPiece(STRUCTURE_PIECE_MAIN, stackSize, 1, 2, 0, elementBudget, env, false, true);
     }
 
-    private int mCasingAmount;
-
     private void onCasingAdded() {
         mCasingAmount++;
     }
@@ -182,12 +159,15 @@ public class MTEIndustrialExtruderModern extends MTEExtendedPowerMultiBlockBase<
     @Override
     public boolean checkMachine(IGregTechTileEntity aBaseMetaTileEntity, ItemStack aStack) {
         mCasingAmount = 0;
-        return checkPiece(STRUCTURE_PIECE_MAIN, 1, 2, 0) && mCasingAmount >= 14;
+        checkPiece(STRUCTURE_PIECE_MAIN, 1, 2, 0);
+        if (mMaintenanceHatches.isEmpty()) return false;
+        if (mCasingAmount < 14) return false;
+        return true;
     }
 
     @Override
     protected ProcessingLogic createProcessingLogic() {
-        return new ProcessingLogic().setSpeedBonus(1F / 1.5F)
+        return new ProcessingLogic().setSpeedBonus(1F / 3.5F)
             .setMaxParallelSupplier(this::getTrueParallel);
     }
 
@@ -198,26 +178,26 @@ public class MTEIndustrialExtruderModern extends MTEExtendedPowerMultiBlockBase<
 
     @Override
     public RecipeMap<?> getRecipeMap() {
-        return RecipeMaps.brewingRecipes;
+        return RecipeMaps.extruderRecipes;
     }
 
     @Override
-    public boolean supportsVoidProtection() {
-        return true;
+    public int getRecipeCatalystPriority() {
+        return -1;
     }
 
     @Override
-    public boolean supportsBatchMode() {
-        return true;
+    protected SoundResource getProcessStartSound() {
+        return SoundResource.IC2_MACHINES_INDUCTION_LOOP;
     }
 
     @Override
-    public boolean supportsInputSeparation() {
-        return true;
+    public int getPollutionPerSecond(ItemStack aStack) {
+        return PollutionConfig.pollutionPerSecondMultiIndustrialExtruder;
     }
 
     @Override
-    public boolean supportsSingleRecipeLocking() {
+    public boolean isInputSeparationEnabled() {
         return true;
     }
 }
