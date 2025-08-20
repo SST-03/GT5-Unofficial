@@ -186,6 +186,7 @@ import gregtech.common.tileentities.machines.multi.processing.MTEIndustrialElect
 import gregtech.common.tileentities.machines.multi.processing.MTEIndustrialExtractor;
 import gregtech.common.tileentities.machines.multi.processing.MTEIndustrialExtruderModern;
 import gregtech.common.tileentities.machines.multi.processing.MTEIndustrialForgeHammerModern;
+import gregtech.common.tileentities.machines.multi.processing.MTEIndustrialFormerModern;
 import gregtech.common.tileentities.machines.multi.processing.MTEIndustrialImplosionCompressorModern;
 import gregtech.common.tileentities.machines.multi.processing.MTEIndustrialLaserEngraver;
 import gregtech.common.tileentities.machines.multi.processing.MTEIndustrialMacerationStackModern;
@@ -704,6 +705,11 @@ public class LoaderMetaTileEntities implements Runnable { // TODO CHECK CIRCUIT 
                 Industrial_PlatePress_Modern.ID,
                 "industrialbender.controller.tier.single",
                 "Industrial Material Press").getStackForm(1));
+        ItemList.Controller_Industrial_FormerPress_Modern.set(
+            new MTEIndustrialFormerModern(
+                Industrial_FormerPress_Modern.ID,
+                "industrialbender.controller.tier.single",
+                "Industrial Material Former").getStackForm(1));
         ItemList.Controller_Industrial_FishingPond_Modern.set(
             new MTEIndustrialFishingPondModern(
                 Industrial_FishingPond_Modern.ID,

@@ -1568,6 +1568,7 @@ public enum ItemList implements IItemContainer {
     Controller_Industrial_Extruder_Modern,
     Controller_Industrial_Arc_Furnace_Modern,
     Controller_Industrial_PlatePress_Modern,
+    Controller_Industrial_FormerPress_Modern,
     Controller_Industrial_FishingPond_Modern,
     Controller_Advanced_ImplosionCompressor_Modern,
     Controller_AlgaeFarm_Modern,

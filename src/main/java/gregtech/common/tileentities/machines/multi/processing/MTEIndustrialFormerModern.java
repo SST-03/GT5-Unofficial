@@ -33,43 +33,43 @@ import gregtech.api.util.MultiblockTooltipBuilder;
 import gregtech.common.pollution.PollutionConfig;
 import gtPlusPlus.xmod.gregtech.common.blocks.textures.TexturesGtBlock;
 
-public class MTEIndustrialPressModern extends MTEExtendedPowerMultiBlockBase<MTEIndustrialPressModern>
+public class MTEIndustrialFormerModern extends MTEExtendedPowerMultiBlockBase<MTEIndustrialFormerModern>
     implements ISurvivalConstructable {
 
     private static final String STRUCTURE_PIECE_MAIN = "main";
-    private static final IStructureDefinition<MTEIndustrialPressModern> STRUCTURE_DEFINITION = StructureDefinition
-        .<MTEIndustrialPressModern>builder()
+    private static final IStructureDefinition<MTEIndustrialFormerModern> STRUCTURE_DEFINITION = StructureDefinition
+        .<MTEIndustrialFormerModern>builder()
         .addShape(
             STRUCTURE_PIECE_MAIN,
             transpose(new String[][] { { "CCC", "CCC", "CCC" }, { "C~C", "C-C", "CCC" }, { "CCC", "CCC", "CCC" } }))
         .addElement(
             'C',
-            buildHatchAdder(MTEIndustrialPressModern.class)
+            buildHatchAdder(MTEIndustrialFormerModern.class)
                 .atLeast(InputBus, OutputBus, InputHatch, Maintenance, Energy, Muffler)
                 .casingIndex(Casings.MaterialPressCasing.textureId)
                 .dot(1)
                 .buildAndChain(
-                    onElementPass(MTEIndustrialPressModern::onCasingAdded, Casings.MaterialPressCasing.asElement())))
+                    onElementPass(MTEIndustrialFormerModern::onCasingAdded, Casings.MaterialPressCasing.asElement())))
         .build();
 
     private int mCasingAmount;
 
-    public MTEIndustrialPressModern(final int aID, final String aName, final String aNameRegional) {
+    public MTEIndustrialFormerModern(final int aID, final String aName, final String aNameRegional) {
         super(aID, aName, aNameRegional);
     }
 
-    public MTEIndustrialPressModern(String aName) {
+    public MTEIndustrialFormerModern(String aName) {
         super(aName);
     }
 
     @Override
-    public IStructureDefinition<MTEIndustrialPressModern> getStructureDefinition() {
+    public IStructureDefinition<MTEIndustrialFormerModern> getStructureDefinition() {
         return STRUCTURE_DEFINITION;
     }
 
     @Override
     public IMetaTileEntity newMetaEntity(IGregTechTileEntity aTileEntity) {
-        return new MTEIndustrialPressModern(this.mName);
+        return new MTEIndustrialFormerModern(this.mName);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class MTEIndustrialPressModern extends MTEExtendedPowerMultiBlockBase<MTE
     @Override
     protected MultiblockTooltipBuilder createTooltip() {
         MultiblockTooltipBuilder tt = new MultiblockTooltipBuilder();
-        tt.addMachineType("Bending Machine, IMP")
+        tt.addMachineType("Forming Machine, IMF")
             .addInfo("500% faster than single block machines of the same voltage")
             .addInfo("Processes four items per voltage tier")
             .addInfo("Circuit for recipe goes in the Input Bus")
@@ -163,7 +163,7 @@ public class MTEIndustrialPressModern extends MTEExtendedPowerMultiBlockBase<MTE
 
     @Override
     public RecipeMap<?> getRecipeMap() {
-        return RecipeMaps.benderRecipes;
+        return RecipeMaps.formingPressRecipes;
     }
 
     @Override
@@ -178,7 +178,7 @@ public class MTEIndustrialPressModern extends MTEExtendedPowerMultiBlockBase<MTE
 
     @Override
     public int getPollutionPerSecond(ItemStack aStack) {
-        return PollutionConfig.pollutionPerSecondMultiIndustrialPlatePress_ModeBending;
+        return PollutionConfig.pollutionPerSecondMultiIndustrialPlatePress_ModeForming;
     }
 
     @Override
