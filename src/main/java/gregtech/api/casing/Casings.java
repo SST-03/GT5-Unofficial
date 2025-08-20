@@ -263,6 +263,8 @@ public enum Casings implements ICasing {
 
     CentrifugeCasing
         (() -> ModBlocks.blockCasingsMisc, 0, gtpp(0, 0)),
+    WiremillCasing
+        (() -> ModBlocks.blockCasingsMisc, 6, gtpp(0, 6)),
 
     MagicCasing
         (() -> Loaders.magicCasing, 0, -1),
