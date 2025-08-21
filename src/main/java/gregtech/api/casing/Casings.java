@@ -273,6 +273,8 @@ public enum Casings implements ICasing {
         (() -> GregTechAPI.sBlockCasings4, 11, ((BlockCasings4) GregTechAPI.sBlockCasings4).getTextureIndex(11)),
     MultiUseCasing
         (() -> ModBlocks.blockCasings3Misc, 2, gtpp(2, 2)),
+    CuttingFactoryCasing
+        (() -> ModBlocks.blockCasings2Misc, 13, gtpp(0, 29)),
 
     MagicCasing
         (() -> Loaders.magicCasing, 0, -1),
