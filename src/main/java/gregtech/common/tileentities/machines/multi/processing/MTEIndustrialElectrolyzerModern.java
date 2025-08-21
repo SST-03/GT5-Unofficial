@@ -1,17 +1,13 @@
 package gregtech.common.tileentities.machines.multi.processing;
 
-import static com.gtnewhorizon.structurelib.structure.StructureUtility.ofBlock;
 import static com.gtnewhorizon.structurelib.structure.StructureUtility.onElementPass;
 import static gregtech.api.enums.HatchElement.Energy;
 import static gregtech.api.enums.HatchElement.InputBus;
 import static gregtech.api.enums.HatchElement.InputHatch;
 import static gregtech.api.enums.HatchElement.Maintenance;
+import static gregtech.api.enums.HatchElement.Muffler;
 import static gregtech.api.enums.HatchElement.OutputBus;
 import static gregtech.api.enums.HatchElement.OutputHatch;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY_ACTIVE;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY_ACTIVE_GLOW;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY_GLOW;
 import static gregtech.api.util.GTStructureUtility.buildHatchAdder;
 import static gregtech.api.util.GTStructureUtility.chainAllGlasses;
 import static gregtech.api.util.GTStructureUtility.ofFrame;
@@ -24,21 +20,21 @@ import com.gtnewhorizon.structurelib.structure.IStructureDefinition;
 import com.gtnewhorizon.structurelib.structure.ISurvivalBuildEnvironment;
 import com.gtnewhorizon.structurelib.structure.StructureDefinition;
 
-import gregtech.api.GregTechAPI;
+import gregtech.api.casing.Casings;
 import gregtech.api.enums.Materials;
-import gregtech.api.enums.Textures;
+import gregtech.api.enums.SoundResource;
 import gregtech.api.interfaces.ITexture;
 import gregtech.api.interfaces.metatileentity.IMetaTileEntity;
 import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
 import gregtech.api.logic.ProcessingLogic;
 import gregtech.api.metatileentity.implementations.MTEExtendedPowerMultiBlockBase;
 import gregtech.api.recipe.RecipeMap;
-import gregtech.api.recipe.RecipeMaps;
 import gregtech.api.render.TextureFactory;
 import gregtech.api.util.GTUtility;
 import gregtech.api.util.MultiblockTooltipBuilder;
-import gregtech.common.blocks.BlockCasings10;
-import gregtech.common.misc.GTStructureChannels;
+import gregtech.common.pollution.PollutionConfig;
+import gtPlusPlus.api.recipe.GTPPRecipeMaps;
+import gtPlusPlus.xmod.gregtech.common.blocks.textures.TexturesGtBlock;
 
 public class MTEIndustrialElectrolyzerModern extends MTEExtendedPowerMultiBlockBase<MTEIndustrialElectrolyzerModern>
     implements ISurvivalConstructable {
@@ -49,39 +45,27 @@ public class MTEIndustrialElectrolyzerModern extends MTEExtendedPowerMultiBlockB
         .addShape(
             STRUCTURE_PIECE_MAIN,
             // spotless:off
-            new String[][]{{
-                "BBB",
-                "BBB",
-                "B~B",
-                "BBB",
-                "C C"
-            },{
-                "BBB",
-                "A A",
-                "A A",
-                "BBB",
-                "   "
-            },{
-                "BBB",
-                "BAB",
-                "BAB",
-                "BBB",
-                "C C"
-            }})
+            new String[][]{
+                {"BBB", "BBB", "B~B", "BBB", "C C"},
+                {"BBB", "A A", "A A", "BBB", "   "},
+                {"BBB", "BAB", "BAB", "BBB", "C C"}
+            })
         //spotless:on
         .addElement(
             'B',
             buildHatchAdder(MTEIndustrialElectrolyzerModern.class)
-                .atLeast(InputBus, OutputBus, InputHatch, OutputHatch, Maintenance, Energy)
-                .casingIndex(((BlockCasings10) GregTechAPI.sBlockCasings10).getTextureIndex(15))
+                .atLeast(InputBus, OutputBus, InputHatch, OutputHatch, Maintenance, Energy, Muffler)
+                .casingIndex(Casings.ElectrolyzerCasing.textureId)
                 .dot(1)
                 .buildAndChain(
                     onElementPass(
                         MTEIndustrialElectrolyzerModern::onCasingAdded,
-                        ofBlock(GregTechAPI.sBlockCasings10, 15))))
+                        Casings.ElectrolyzerCasing.asElement())))
         .addElement('A', chainAllGlasses())
         .addElement('C', ofFrame(Materials.Steel))
         .build();
+
+    private int mCasingAmount;
 
     public MTEIndustrialElectrolyzerModern(final int aID, final String aName, final String aNameRegional) {
         super(aID, aName, aNameRegional);
@@ -107,35 +91,28 @@ public class MTEIndustrialElectrolyzerModern extends MTEExtendedPowerMultiBlockB
         ITexture[] rTexture;
         if (side == aFacing) {
             if (aActive) {
-                rTexture = new ITexture[] {
-                    Textures.BlockIcons
-                        .getCasingTextureForId(GTUtility.getCasingTextureIndex(GregTechAPI.sBlockCasings10, 15)),
+                rTexture = new ITexture[] { Casings.ElectrolyzerCasing.getCasingTexture(), TextureFactory.builder()
+                    .addIcon(TexturesGtBlock.oMCDIndustrialElectrolyzerActive)
+                    .extFacing()
+                    .build(),
                     TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY_ACTIVE)
-                        .extFacing()
-                        .build(),
-                    TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY_ACTIVE_GLOW)
+                        .addIcon(TexturesGtBlock.oMCDIndustrialElectrolyzerActiveGlow)
                         .extFacing()
                         .glow()
                         .build() };
             } else {
-                rTexture = new ITexture[] {
-                    Textures.BlockIcons
-                        .getCasingTextureForId(GTUtility.getCasingTextureIndex(GregTechAPI.sBlockCasings10, 15)),
+                rTexture = new ITexture[] { Casings.ElectrolyzerCasing.getCasingTexture(), TextureFactory.builder()
+                    .addIcon(TexturesGtBlock.oMCDIndustrialElectrolyzer)
+                    .extFacing()
+                    .build(),
                     TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY)
-                        .extFacing()
-                        .build(),
-                    TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY_GLOW)
+                        .addIcon(TexturesGtBlock.oMCDIndustrialElectrolyzerGlow)
                         .extFacing()
                         .glow()
                         .build() };
             }
         } else {
-            rTexture = new ITexture[] { Textures.BlockIcons
-                .getCasingTextureForId(GTUtility.getCasingTextureIndex(GregTechAPI.sBlockCasings10, 15)) };
+            rTexture = new ITexture[] { Casings.ElectrolyzerCasing.getCasingTexture() };
         }
         return rTexture;
     }
@@ -143,21 +120,23 @@ public class MTEIndustrialElectrolyzerModern extends MTEExtendedPowerMultiBlockB
     @Override
     protected MultiblockTooltipBuilder createTooltip() {
         MultiblockTooltipBuilder tt = new MultiblockTooltipBuilder();
-        tt.addMachineType("Brewery")
-            .addInfo("50% faster than singleblock machines of the same voltage")
-            .addInfo("Gains 4 parallels per voltage tier")
+        tt.addMachineType("Electrolyzer")
+            .addInfo("280% faster than single block machines of the same voltage")
+            .addInfo("Only uses 90% of the EU/t normally required")
+            .addInfo("Processes two items per voltage tier")
+            .addPollutionAmount(PollutionConfig.pollutionPerSecondMultiIndustrialElectrolyzer)
             .beginStructureBlock(3, 5, 3, true)
             .addController("Front Center")
-            .addCasingInfoMin("Reinforced Wooden Casing", 14, false)
+            .addCasingInfoMin("Electrolyzer Casings", 6, false)
             .addCasingInfoExactly("Any Tiered Glass", 6, false)
             .addCasingInfoExactly("Steel Frame Box", 4, false)
-            .addInputBus("Any Wooden Casing", 1)
-            .addOutputBus("Any Wooden Casing", 1)
-            .addInputHatch("Any Wooden Casing", 1)
-            .addOutputHatch("Any Wooden Casing", 1)
-            .addEnergyHatch("Any Wooden Casing", 1)
-            .addMaintenanceHatch("Any Wooden Casing", 1)
-            .addSubChannelUsage(GTStructureChannels.BOROGLASS)
+            .addInputBus("Any Casing", 1)
+            .addOutputBus("Any Casing", 1)
+            .addInputHatch("Any Casing", 1)
+            .addOutputHatch("Any Casing", 1)
+            .addEnergyHatch("Any Casing", 1)
+            .addMaintenanceHatch("Any Casing", 1)
+            .addMufflerHatch("Any Casing", 1)
             .toolTipFinisher();
         return tt;
     }
@@ -173,8 +152,6 @@ public class MTEIndustrialElectrolyzerModern extends MTEExtendedPowerMultiBlockB
         return survivalBuildPiece(STRUCTURE_PIECE_MAIN, stackSize, 1, 2, 0, elementBudget, env, false, true);
     }
 
-    private int mCasingAmount;
-
     private void onCasingAdded() {
         mCasingAmount++;
     }
@@ -182,23 +159,38 @@ public class MTEIndustrialElectrolyzerModern extends MTEExtendedPowerMultiBlockB
     @Override
     public boolean checkMachine(IGregTechTileEntity aBaseMetaTileEntity, ItemStack aStack) {
         mCasingAmount = 0;
-        return checkPiece(STRUCTURE_PIECE_MAIN, 1, 2, 0) && mCasingAmount >= 14;
+        if (!checkPiece(STRUCTURE_PIECE_MAIN, 1, 2, 0)) return false;
+        if (mMaintenanceHatches.isEmpty()) return false;
+        if (mCasingAmount < 6) return false;
+        return true;
     }
 
     @Override
     protected ProcessingLogic createProcessingLogic() {
-        return new ProcessingLogic().setSpeedBonus(1F / 1.5F)
+        return new ProcessingLogic().noRecipeCaching()
+            .setSpeedBonus(1F / 2.8F)
+            .setEuModifier(0.9F)
             .setMaxParallelSupplier(this::getTrueParallel);
     }
 
     @Override
     public int getMaxParallelRecipes() {
-        return (4 * GTUtility.getTier(this.getMaxInputVoltage()));
+        return (2 * GTUtility.getTier(this.getMaxInputVoltage()));
     }
 
     @Override
     public RecipeMap<?> getRecipeMap() {
-        return RecipeMaps.brewingRecipes;
+        return GTPPRecipeMaps.electrolyzerNonCellRecipes;
+    }
+
+    @Override
+    public int getRecipeCatalystPriority() {
+        return -1;
+    }
+
+    @Override
+    protected SoundResource getActivitySoundLoop() {
+        return SoundResource.NONE;
     }
 
     @Override
@@ -219,5 +211,10 @@ public class MTEIndustrialElectrolyzerModern extends MTEExtendedPowerMultiBlockB
     @Override
     public boolean supportsSingleRecipeLocking() {
         return true;
+    }
+
+    @Override
+    public int getPollutionPerSecond(ItemStack aStack) {
+        return PollutionConfig.pollutionPerSecondMultiIndustrialElectrolyzer;
     }
 }
