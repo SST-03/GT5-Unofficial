@@ -279,6 +279,10 @@ public enum Casings implements ICasing {
         (() -> ModBlocks.blockCasingsMisc, 5, gtpp(0, 5)),
     PrinterCasing
         (() -> ModBlocks.blockCasings5Misc, 5, 90),
+    SieveCasing
+        (() -> ModBlocks.blockCasings2Misc, 5, gtpp(0, 21)),
+    SieveGrate
+        (() -> ModBlocks.blockCasings2Misc, 6, 0), //more block than a casing, so texture id isn't used
 
     MagicCasing
         (() -> Loaders.magicCasing, 0, -1),
