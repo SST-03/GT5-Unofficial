@@ -708,7 +708,7 @@ public class LoaderMetaTileEntities implements Runnable { // TODO CHECK CIRCUIT 
         ItemList.Controller_Industrial_FormerPress_Modern.set(
             new MTEIndustrialFormerModern(
                 Industrial_FormerPress_Modern.ID,
-                "industrialbender.controller.tier.single",
+                "industrialformer.controller.tier.single",
                 "Industrial Material Former").getStackForm(1));
         ItemList.Controller_Industrial_FishingPond_Modern.set(
             new MTEIndustrialFishingPondModern(
