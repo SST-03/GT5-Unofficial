@@ -277,6 +277,8 @@ public enum Casings implements ICasing {
         (() -> ModBlocks.blockCasings2Misc, 13, gtpp(0, 29)),
     ElectrolyzerCasing
         (() -> ModBlocks.blockCasingsMisc, 5, gtpp(0, 5)),
+    PrinterCasing
+        (() -> ModBlocks.blockCasings5Misc, 5, 90),
 
     MagicCasing
         (() -> Loaders.magicCasing, 0, -1),
