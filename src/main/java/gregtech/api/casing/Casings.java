@@ -282,13 +282,15 @@ public enum Casings implements ICasing {
     SieveCasing
         (() -> ModBlocks.blockCasings2Misc, 5, gtpp(0, 21)),
     SieveGrate
-        (() -> ModBlocks.blockCasings2Misc, 6, 0), //more block than a casing, so texture id isn't used
+        (() -> ModBlocks.blockCasings2Misc, 6, -1),
     CokeOvenCasing
         (() ->  ModBlocks.blockCasingsMisc, 1 , gtpp(0,1)),
     HeatResistantCokeOvenCasing
-        (() -> ModBlocks.blockCasingsMisc, 2, 0),
+        (() -> ModBlocks.blockCasingsMisc, 2, -1),
     HeatProofCokeOvenCasing
-        (() -> ModBlocks.blockCasingsMisc, 3, 0),
+        (() -> ModBlocks.blockCasingsMisc, 3, -1),
+    HeatProofCasing
+        (() -> GregTechAPI.sBlockCasings1, 11,11),
 
     MagicCasing
         (() -> Loaders.magicCasing, 0, -1),
