@@ -1,20 +1,15 @@
 package gregtech.common.tileentities.machines.multi.processing;
 
-import static com.gtnewhorizon.structurelib.structure.StructureUtility.ofBlock;
 import static com.gtnewhorizon.structurelib.structure.StructureUtility.onElementPass;
+import static com.gtnewhorizon.structurelib.structure.StructureUtility.transpose;
 import static gregtech.api.enums.HatchElement.Energy;
 import static gregtech.api.enums.HatchElement.InputBus;
 import static gregtech.api.enums.HatchElement.InputHatch;
 import static gregtech.api.enums.HatchElement.Maintenance;
+import static gregtech.api.enums.HatchElement.Muffler;
 import static gregtech.api.enums.HatchElement.OutputBus;
 import static gregtech.api.enums.HatchElement.OutputHatch;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY_ACTIVE;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY_ACTIVE_GLOW;
-import static gregtech.api.enums.Textures.BlockIcons.OVERLAY_FRONT_MULTI_BREWERY_GLOW;
 import static gregtech.api.util.GTStructureUtility.buildHatchAdder;
-import static gregtech.api.util.GTStructureUtility.chainAllGlasses;
-import static gregtech.api.util.GTStructureUtility.ofFrame;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -24,63 +19,61 @@ import com.gtnewhorizon.structurelib.structure.IStructureDefinition;
 import com.gtnewhorizon.structurelib.structure.ISurvivalBuildEnvironment;
 import com.gtnewhorizon.structurelib.structure.StructureDefinition;
 
-import gregtech.api.GregTechAPI;
-import gregtech.api.enums.Materials;
-import gregtech.api.enums.Textures;
+import gregtech.api.casing.Casings;
+import gregtech.api.enums.SoundResource;
 import gregtech.api.interfaces.ITexture;
 import gregtech.api.interfaces.metatileentity.IMetaTileEntity;
 import gregtech.api.interfaces.tileentity.IGregTechTileEntity;
 import gregtech.api.logic.ProcessingLogic;
 import gregtech.api.metatileentity.implementations.MTEExtendedPowerMultiBlockBase;
 import gregtech.api.recipe.RecipeMap;
-import gregtech.api.recipe.RecipeMaps;
 import gregtech.api.render.TextureFactory;
 import gregtech.api.util.GTUtility;
 import gregtech.api.util.MultiblockTooltipBuilder;
-import gregtech.common.blocks.BlockCasings10;
-import gregtech.common.misc.GTStructureChannels;
+import gregtech.common.pollution.PollutionConfig;
+import gtPlusPlus.api.recipe.GTPPRecipeMaps;
+import gtPlusPlus.xmod.gregtech.common.blocks.textures.TexturesGtBlock;
 
 public class MTEIndustrialCokeOvenModern extends MTEExtendedPowerMultiBlockBase<MTEIndustrialCokeOvenModern>
     implements ISurvivalConstructable {
 
-    private static final String STRUCTURE_PIECE_MAIN = "main";
+    private static final int horizontalOffset = 1;
+    private static final int verticalOffset = 2;
+    private static final int depthOffset = 0;
+    private int mTier = 0;
+    private int mCasingAmount = 0;
+    private static final String STRUCTURE_PIECE_T1 = "t1";
+    private static final String STRUCTURE_PIECE_T2 = "t2";
     private static final IStructureDefinition<MTEIndustrialCokeOvenModern> STRUCTURE_DEFINITION = StructureDefinition
         .<MTEIndustrialCokeOvenModern>builder()
+        // spotless:off
         .addShape(
-            STRUCTURE_PIECE_MAIN,
-            // spotless:off
-            new String[][]{{
-                "BBB",
-                "BBB",
-                "B~B",
-                "BBB",
-                "C C"
-            },{
-                "BBB",
-                "A A",
-                "A A",
-                "BBB",
-                "   "
-            },{
-                "BBB",
-                "BAB",
-                "BAB",
-                "BBB",
-                "C C"
-            }})
-        //spotless:on
+            STRUCTURE_PIECE_T1,
+            transpose(
+                new String[][] {
+                    { "CCC", "CCC", "CCC" },
+                    { "AAA", "A A", "AAA" },
+                    { "C~C", "CCC", "CCC" }
+                }))
+        .addShape(
+            STRUCTURE_PIECE_T2,
+            transpose(
+                new String[][] {
+                    { "CCC", "CCC", "CCC" },
+                    { "BBB", "B B", "BBB" },
+                    { "C~C", "CCC", "CCC" }
+                }))
+            //spotless:on
         .addElement(
-            'B',
+            'C',
             buildHatchAdder(MTEIndustrialCokeOvenModern.class)
-                .atLeast(InputBus, OutputBus, InputHatch, OutputHatch, Maintenance, Energy)
-                .casingIndex(((BlockCasings10) GregTechAPI.sBlockCasings10).getTextureIndex(15))
+                .atLeast(InputBus, OutputBus, InputHatch, OutputHatch, Maintenance, Energy, Muffler)
+                .casingIndex(Casings.CokeOvenCasing.textureId)
                 .dot(1)
                 .buildAndChain(
-                    onElementPass(
-                        MTEIndustrialCokeOvenModern::onCasingAdded,
-                        ofBlock(GregTechAPI.sBlockCasings10, 15))))
-        .addElement('A', chainAllGlasses())
-        .addElement('C', ofFrame(Materials.Steel))
+                    onElementPass(MTEIndustrialCokeOvenModern::onCasingAdded, Casings.CokeOvenCasing.asElement())))
+        .addElement('A', Casings.HeatResistantCokeOvenCasing.asElement())
+        .addElement('B', Casings.HeatProofCokeOvenCasing.asElement())
         .build();
 
     public MTEIndustrialCokeOvenModern(final int aID, final String aName, final String aNameRegional) {
@@ -107,35 +100,28 @@ public class MTEIndustrialCokeOvenModern extends MTEExtendedPowerMultiBlockBase<
         ITexture[] rTexture;
         if (side == aFacing) {
             if (aActive) {
-                rTexture = new ITexture[] {
-                    Textures.BlockIcons
-                        .getCasingTextureForId(GTUtility.getCasingTextureIndex(GregTechAPI.sBlockCasings10, 15)),
+                rTexture = new ITexture[] { Casings.CokeOvenCasing.getCasingTexture(), TextureFactory.builder()
+                    .addIcon(TexturesGtBlock.oMCACokeOvenActive)
+                    .extFacing()
+                    .build(),
                     TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY_ACTIVE)
-                        .extFacing()
-                        .build(),
-                    TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY_ACTIVE_GLOW)
+                        .addIcon(TexturesGtBlock.oMCACokeOvenActiveGlow)
                         .extFacing()
                         .glow()
                         .build() };
             } else {
-                rTexture = new ITexture[] {
-                    Textures.BlockIcons
-                        .getCasingTextureForId(GTUtility.getCasingTextureIndex(GregTechAPI.sBlockCasings10, 15)),
+                rTexture = new ITexture[] { Casings.CokeOvenCasing.getCasingTexture(), TextureFactory.builder()
+                    .addIcon(TexturesGtBlock.oMCACokeOven)
+                    .extFacing()
+                    .build(),
                     TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY)
-                        .extFacing()
-                        .build(),
-                    TextureFactory.builder()
-                        .addIcon(OVERLAY_FRONT_MULTI_BREWERY_GLOW)
+                        .addIcon(TexturesGtBlock.oMCACokeOvenGlow)
                         .extFacing()
                         .glow()
                         .build() };
             }
         } else {
-            rTexture = new ITexture[] { Textures.BlockIcons
-                .getCasingTextureForId(GTUtility.getCasingTextureIndex(GregTechAPI.sBlockCasings10, 15)) };
+            rTexture = new ITexture[] { Casings.CokeOvenCasing.getCasingTexture() };
         }
         return rTexture;
     }
@@ -143,62 +129,118 @@ public class MTEIndustrialCokeOvenModern extends MTEExtendedPowerMultiBlockBase<
     @Override
     protected MultiblockTooltipBuilder createTooltip() {
         MultiblockTooltipBuilder tt = new MultiblockTooltipBuilder();
-        tt.addMachineType("Brewery")
-            .addInfo("50% faster than singleblock machines of the same voltage")
-            .addInfo("Gains 4 parallels per voltage tier")
+        tt.addMachineType("Coke Oven")
+            .addInfo("100% faster than single block machines of the same voltage")
+            .addInfo("EU/t use reduced by 4% per voltage tier")
+            .addInfo("Processes 12 items per level (Level 1: Heat Proof, Level 2: Heat Resistant)")
+            .addPollutionAmount(PollutionConfig.pollutionPerSecondMultiIndustrialCokeOven)
             .beginStructureBlock(3, 5, 3, true)
             .addController("Front Center")
-            .addCasingInfoMin("Reinforced Wooden Casing", 14, false)
+            .addCasingInfoMin("Heat Proof Machine Casings", 8, false)
+            .addCasingInfoExactly("Heat Resistant Casings", 8, true)
             .addCasingInfoExactly("Any Tiered Glass", 6, false)
             .addCasingInfoExactly("Steel Frame Box", 4, false)
-            .addInputBus("Any Wooden Casing", 1)
-            .addOutputBus("Any Wooden Casing", 1)
-            .addInputHatch("Any Wooden Casing", 1)
-            .addOutputHatch("Any Wooden Casing", 1)
-            .addEnergyHatch("Any Wooden Casing", 1)
-            .addMaintenanceHatch("Any Wooden Casing", 1)
-            .addSubChannelUsage(GTStructureChannels.BOROGLASS)
+            .addInputBus("Any Casing", 1)
+            .addOutputBus("Any Casing", 1)
+            .addInputHatch("Any Casing", 1)
+            .addOutputHatch("Any Casing", 1)
+            .addEnergyHatch("Any Casing", 1)
+            .addMaintenanceHatch("Any Casing", 1)
+            .addMufflerHatch("Any Casing", 1)
             .toolTipFinisher();
         return tt;
     }
-
-    @Override
-    public void construct(ItemStack stackSize, boolean hintsOnly) {
-        buildPiece(STRUCTURE_PIECE_MAIN, stackSize, hintsOnly, 1, 2, 0);
-    }
-
-    @Override
-    public int survivalConstruct(ItemStack stackSize, int elementBudget, ISurvivalBuildEnvironment env) {
-        if (mMachine) return -1;
-        return survivalBuildPiece(STRUCTURE_PIECE_MAIN, stackSize, 1, 2, 0, elementBudget, env, false, true);
-    }
-
-    private int mCasingAmount;
 
     private void onCasingAdded() {
         mCasingAmount++;
     }
 
     @Override
+    public void construct(ItemStack holoStack, boolean hintsOnly) {
+        if (holoStack.stackSize == 1) {
+            buildPiece(STRUCTURE_PIECE_T1, holoStack, hintsOnly, horizontalOffset, verticalOffset, depthOffset);
+        }
+        if (holoStack.stackSize == 2) {
+            buildPiece(STRUCTURE_PIECE_T2, holoStack, hintsOnly, horizontalOffset, verticalOffset, depthOffset);
+        }
+    }
+
+    @Override
+    public int survivalConstruct(ItemStack holoStack, int elementBudget, ISurvivalBuildEnvironment env) {
+        if (mMachine) return -1;
+        if (holoStack.stackSize == 1) {
+            return survivalBuildPiece(
+                STRUCTURE_PIECE_T1,
+                holoStack,
+                horizontalOffset,
+                verticalOffset,
+                depthOffset,
+                elementBudget,
+                env,
+                false,
+                true);
+        }
+        if (holoStack.stackSize == 2) {
+            return survivalBuildPiece(
+                STRUCTURE_PIECE_T2,
+                holoStack,
+                horizontalOffset,
+                verticalOffset,
+                depthOffset,
+                elementBudget,
+                env,
+                false,
+                true);
+        }
+        return 0;
+    }
+
+    @Override
     public boolean checkMachine(IGregTechTileEntity aBaseMetaTileEntity, ItemStack aStack) {
         mCasingAmount = 0;
-        return checkPiece(STRUCTURE_PIECE_MAIN, 1, 2, 0) && mCasingAmount >= 14;
+        mTier = 0;
+        if (checkPiece(STRUCTURE_PIECE_T1, horizontalOffset, verticalOffset, depthOffset)) {
+            mTier = 1;
+        }
+        mCasingAmount = 0;
+        if (checkPiece(STRUCTURE_PIECE_T2, horizontalOffset, verticalOffset, depthOffset)) {
+            mTier = 2;
+        }
+        if (mMaintenanceHatches.isEmpty()) return false;
+        if (mMufflerHatches.isEmpty()) return false;
+        if (mCasingAmount < 8) return false;
+        return mTier > 0;
     }
 
     @Override
     protected ProcessingLogic createProcessingLogic() {
-        return new ProcessingLogic().setSpeedBonus(1F / 1.5F)
-            .setMaxParallelSupplier(this::getTrueParallel);
+        return new ProcessingLogic().setMaxParallelSupplier(this::getTrueParallel);
+    }
+
+    @Override
+    protected void setupProcessingLogic(ProcessingLogic logic) {
+        super.setupProcessingLogic(logic);
+        logic.setEuModifier((100F - (GTUtility.getTier(getMaxInputVoltage()) * 4)) / 100F);
     }
 
     @Override
     public int getMaxParallelRecipes() {
-        return (4 * GTUtility.getTier(this.getMaxInputVoltage()));
+        return this.mTier * 12;
     }
 
     @Override
     public RecipeMap<?> getRecipeMap() {
-        return RecipeMaps.brewingRecipes;
+        return GTPPRecipeMaps.cokeOvenRecipes;
+    }
+
+    @Override
+    public int getRecipeCatalystPriority() {
+        return -1;
+    }
+
+    @Override
+    protected SoundResource getActivitySoundLoop() {
+        return SoundResource.IC2_MACHINES_ELECTROFURNACE_LOOP;
     }
 
     @Override
@@ -219,5 +261,10 @@ public class MTEIndustrialCokeOvenModern extends MTEExtendedPowerMultiBlockBase<
     @Override
     public boolean supportsSingleRecipeLocking() {
         return true;
+    }
+
+    @Override
+    public int getPollutionPerSecond(ItemStack aStack) {
+        return PollutionConfig.pollutionPerSecondMultiIndustrialCokeOven;
     }
 }
