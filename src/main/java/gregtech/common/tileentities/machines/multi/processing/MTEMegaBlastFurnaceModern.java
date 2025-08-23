@@ -306,11 +306,6 @@ public class MTEMegaBlastFurnaceModern extends MTEExtendedPowerMultiBlockBase<MT
     }
 
     @Override
-    public boolean supportsSingleRecipeLocking() {
-        return true;
-    }
-
-    @Override
     public int getPollutionPerSecond(ItemStack aStack) {
         return PollutionConfig.basePollutionMBFSecond;
     }
