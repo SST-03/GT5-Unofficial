@@ -799,6 +799,12 @@ public class PlatinumSludgeOverHaul {
             }
         }
 
+
+        ITEMLIST_VALUES.add(GTOreDictUnificator.get(OrePrefixes.frameGt, Materials.Osmium, 1));
+        ITEMLIST_VALUES.add(GTOreDictUnificator.get(OrePrefixes.frameGt, Materials.Iridium, 1));
+        ITEMLIST_VALUES.add(GTOreDictUnificator.get(OrePrefixes.frameGt, Materials.Palladium, 1));
+        ITEMLIST_VALUES.add(GTOreDictUnificator.get(OrePrefixes.frameGt, Materials.Platinum, 1));
+
         // furnace
         for (Object entry : FurnaceRecipes.smelting()
             .getSmeltingList()
