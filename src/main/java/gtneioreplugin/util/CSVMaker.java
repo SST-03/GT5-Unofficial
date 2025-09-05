@@ -77,13 +77,13 @@ public class CSVMaker implements Runnable {
                 Map.Entry<String, OreLayerWrapper> pair = it.next();
                 Map<String, Boolean> Dims = GT5OreLayerHelper.bufferedDims.get(pair.getValue());
                 OreLayerWrapper oreLayer = pair.getValue();
-                oremix.setOreMixName(oreLayer.veinName);
+                oremix.setOreMixName(oreLayer.localizedName);
                 oremix.setPrimary(PluginGT5VeinStat.getGTOreLocalizedName(oreLayer.Meta[0]));
                 oremix.setSecondary(PluginGT5VeinStat.getGTOreLocalizedName(oreLayer.Meta[1]));
                 oremix.setInbetween(PluginGT5VeinStat.getGTOreLocalizedName(oreLayer.Meta[2]));
                 oremix.setSporadic(PluginGT5VeinStat.getGTOreLocalizedName(oreLayer.Meta[3]));
                 oremix.setSize(oreLayer.size);
-                oremix.setHeight(oreLayer.worldGenHeightRange);
+                oremix.setHeight("H" + oreLayer.worldGenHeightRange);
                 oremix.setDensity(oreLayer.density);
                 oremix.setWeight(oreLayer.randomWeight);
                 oremix.setOreMixIDs(
