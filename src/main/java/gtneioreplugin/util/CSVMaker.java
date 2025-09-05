@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import bartworks.system.material.Werkstoff;
+import gregtech.api.util.GTLanguageManager;
 import gtneioreplugin.Config;
 import gtneioreplugin.GTNEIOrePlugin;
 import gtneioreplugin.plugin.gregtech5.PluginGT5VeinStat;
