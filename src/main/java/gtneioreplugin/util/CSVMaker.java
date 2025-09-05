@@ -66,6 +66,19 @@ public class CSVMaker implements Runnable {
         runSmallOres();
     }
 
+    private static String getBWOreName(short meta) {
+        final Werkstoff werkstoff = Werkstoff.werkstoffHashMap.getOrDefault(meta, null);
+        return GTLanguageManager.getTranslation("bw.blocktype.ore")
+            .replace("%material", werkstoff.getLocalizedName());
+    }
+
+    private static String getOreName(OreLayerWrapper oreLayer, int veinLayer) {
+        final String oreName;
+        if ((oreLayer.bwOres & 0b1000 >> veinLayer) != 0) oreName = getBWOreName(oreLayer.Meta[veinLayer]);
+        else oreName = PluginGT5VeinStat.getGTOreLocalizedName(oreLayer.Meta[veinLayer]);
+        return oreName;
+    }
+    
     public void runVeins() {
         try {
             Iterator<Map.Entry<String, OreLayerWrapper>> it = GT5OreLayerHelper.mapOreLayerWrapper.entrySet()
@@ -78,10 +91,10 @@ public class CSVMaker implements Runnable {
                 Map<String, Boolean> Dims = GT5OreLayerHelper.bufferedDims.get(pair.getValue());
                 OreLayerWrapper oreLayer = pair.getValue();
                 oremix.setOreMixName(oreLayer.localizedName);
-                oremix.setPrimary(PluginGT5VeinStat.getGTOreLocalizedName(oreLayer.Meta[0]));
-                oremix.setSecondary(PluginGT5VeinStat.getGTOreLocalizedName(oreLayer.Meta[1]));
-                oremix.setInbetween(PluginGT5VeinStat.getGTOreLocalizedName(oreLayer.Meta[2]));
-                oremix.setSporadic(PluginGT5VeinStat.getGTOreLocalizedName(oreLayer.Meta[3]));
+                oremix.setPrimary(getOreName(0));
+                oremix.setSecondary(getOreName(1));
+                oremix.setInbetween(getOreName(2));
+                oremix.setSporadic(getOreName(3));
                 oremix.setSize(oreLayer.size);
                 oremix.setHeight("H" + oreLayer.worldGenHeightRange);
                 oremix.setDensity(oreLayer.density);
