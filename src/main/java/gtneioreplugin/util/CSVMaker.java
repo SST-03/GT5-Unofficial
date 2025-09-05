@@ -93,10 +93,10 @@ public class CSVMaker implements Runnable {
                 Map<String, Boolean> Dims = GT5OreLayerHelper.bufferedDims.get(pair.getValue());
                 OreLayerWrapper oreLayer = pair.getValue();
                 oremix.setOreMixName(oreLayer.localizedName);
-                oremix.setPrimary(getOreName(0));
-                oremix.setSecondary(getOreName(1));
-                oremix.setInbetween(getOreName(2));
-                oremix.setSporadic(getOreName(3));
+                oremix.setPrimary(getOreName(oreLayer,0));
+                oremix.setSecondary(getOreName(oreLayer,1));
+                oremix.setInbetween(getOreName(oreLayer,2));
+                oremix.setSporadic(getOreName(oreLayer,3));
                 oremix.setSize(oreLayer.size);
                 oremix.setHeight("H" + oreLayer.worldGenHeightRange);
                 oremix.setDensity(oreLayer.density);
