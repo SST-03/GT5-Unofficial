@@ -24,7 +24,7 @@ public class Oremix implements Comparable<Oremix> {
 
     private int weight;
 
-    private static final int sizeData = 10; // hors dims
+    private static final int sizeData = 11; // hors dims
 
     private Map<String, Boolean> dimensions;
 
@@ -93,6 +93,7 @@ public class Oremix implements Comparable<Oremix> {
         headers[7] = "Density";
         headers[8] = "Size";
         headers[9] = "Weight";
+        headers[10] = "DIMS";
         for (int i = 0; i < DimensionHelper.DimNameDisplayed.length; i++) {
             headers[sizeData + i] = DimensionHelper.getFullName(DimensionHelper.DimNameDisplayed[i]);
         }
@@ -111,10 +112,13 @@ public class Oremix implements Comparable<Oremix> {
         values[7] = Integer.toString(density);
         values[8] = Integer.toString(size);
         values[9] = Integer.toString(weight);
+        String str = "";
         for (int i = 0; i < DimensionHelper.DimNameDisplayed.length; i++) {
-            values[sizeData + i] = Boolean
-                .toString(dimensions.getOrDefault(DimensionHelper.DimNameDisplayed[i], false));
+            boolean bool = dimensions.getOrDefault(DimensionHelper.DimNameDisplayed[i], false
+            values[sizeData + i] = Boolean.toString(bool));
+            if (bool) str += "|" + DimensionHelper.getFullName(DimensionHelper.DimNameDisplayed[i]);
         }
+        values[10] = str;
         return String.join(",", values);
     }
 }
