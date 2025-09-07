@@ -141,7 +141,7 @@ public class CSVMaker implements Runnable {
         }
     }
 
-    private void runVoidMiner() throws IOException {
+    private void runVoidMiner() throws IOException {try {
         BufferedWriter one = Files.newBufferedWriter(
                 GTNEIOrePlugin.instanceDir.toPath()
                     .resolve("VoidMiner.csv"));
@@ -179,17 +179,20 @@ public class CSVMaker implements Runnable {
 
         one.flush();
         one.close();
+        } catch (IOException e) {throw new IOException(e);}
     }
 
     private static Map<String, String> map_ItemID_ItemName = new HashMap<>();
     
     private static void solveDropMap(BufferedWriter one, VoidMinerUtility.DropMap map) throws IOException {
+        try{
         map.getInternalMap().forEach((GTItemId, weight) -> {
             String unLocName = GTItemId.getItemStack().getUnlocalizedName();
             map_ItemID_ItemName.putIfAbsent(unLocName, GTItemId.getItemStack().getDisplayName());
             one.write(new VoidMinerLine(unLocName, weight.toString()).toString());
             one.newLine();
         });
+        } catch (IOException e) {throw new IOException(e);}
     }
 
     private static class VoidMinerLine {
