@@ -182,7 +182,7 @@ public class CSVMaker implements Runnable {
 
     private static Map<String, String> map_ItemID_ItemName = new HashMap<>();
     
-    private static void solveDropMap(BufferedWriter one, DropMap map) {
+    private static void solveDropMap(BufferedWriter one, VoidMinerUtility.DropMap map) {
         map.getInternalMap().forEach((GTItemId, weight) -> {
             String unLocName = GTItemId.getItemStack().getUnlocalizedName();
             map_ItemID_ItemName.putIfAbsent(unLocName, GTItemId.getItemStack().getDisplayName());
