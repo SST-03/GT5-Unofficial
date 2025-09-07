@@ -153,9 +153,9 @@ public class CSVMaker implements Runnable {
             one.write(new VoidMinerLine("!!dimID!!", dimID.toString()).toString());
             one.newLine();
             
-            List<VoidMinerLine> list = solveDropMap(one, map);
+            List<String> list = solveDropMap(one, map);
             list.forEach((line) -> {
-                one.write(line.toString());
+                one.write(line);
                 one.newLine();
             });
         });
@@ -164,9 +164,9 @@ public class CSVMaker implements Runnable {
             one.write(new VoidMinerLine("chunkProviderName", chunkProviderName).toString());
             one.newLine();
             
-            List<VoidMinerLine> list = solveDropMap(one, map);
+            List<String> list = solveDropMap(one, map);
             list.forEach((line) -> {
-                one.write(line.toString());
+                one.write(line);
                 one.newLine();
             });
         });
@@ -175,9 +175,9 @@ public class CSVMaker implements Runnable {
             one.write(new VoidMinerLine("EXTRA!!dimID!!", dimID.toString()).toString());
             one.newLine();
             
-            List<VoidMinerLine> list = solveDropMap(one, map);
+            List<String> list = solveDropMap(one, map);
             list.forEach((line) -> {
-                one.write(line.toString());
+                one.write(line);
                 one.newLine();
             });
         });
@@ -199,8 +199,8 @@ public class CSVMaker implements Runnable {
 
     private static Map<String, String> map_ItemID_ItemName = new HashMap<>();
     
-    private static List<VoidMinerLine> solveDropMap(BufferedWriter one, VoidMinerUtility.DropMap map) {
-        List<VoidMinerLine> list = new ArrayList<>();
+    private static List<String> solveDropMap(BufferedWriter one, VoidMinerUtility.DropMap map) {
+        List<String> list = new ArrayList<>();
 
         map.getInternalMap().forEach((GTItemId, weight) -> {
             String unLocName = GTItemId.getItemStack().getUnlocalizedName();
