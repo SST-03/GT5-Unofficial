@@ -73,7 +73,7 @@ public class CSVMaker implements Runnable {
     public void run() {
         runVeins();
         runSmallOres();
-        runVoidMiner();
+        try {runVoidMiner();} catch (Exception e) {e.printStackTrace();}
     }
 
     private static String getBWOreName(short meta) {
