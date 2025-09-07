@@ -68,6 +68,7 @@ import gregtech.api.enums.Mods;
 import gregtech.api.recipe.RecipeMap;
 import gregtech.api.recipe.check.CheckRecipeResultRegistry;
 import gregtech.api.util.GlassTier;
+import gtneioreplugin.util.CSVMaker;
 import tectech.loader.recipe.Godforge;
 
 @Mod(
@@ -189,6 +190,7 @@ public final class MainMod {
         runOnServerStarted();
         StaticRecipeChangeLoaders.unificationRecipeEnforcer();
         VoidMinerUtility.generateDropMaps();
+        new CSVMaker().runVoidMiner();
     }
 
     private static boolean recipesAdded;
