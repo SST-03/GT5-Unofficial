@@ -7,13 +7,19 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import bartworks.system.material.Werkstoff;
+import bwcrossmod.galacticgreg.VoidMinerUtility;
 import gregtech.api.util.GTLanguageManager;
 import gtneioreplugin.Config;
 import gtneioreplugin.GTNEIOrePlugin;
 import gtneioreplugin.plugin.gregtech5.PluginGT5VeinStat;
 import gtneioreplugin.util.GT5OreLayerHelper.OreLayerWrapper;
+
+import static bwcrossmod.galacticgreg.VoidMinerUtility.dropMapsByDimId;
+import static bwcrossmod.galacticgreg.VoidMinerUtility.dropMapsByChunkProviderName;
+import static bwcrossmod.galacticgreg.VoidMinerUtility.extraDropsDimMap;
 
 // todo: yeet any opencsv usage.
 public class CSVMaker implements Runnable {
@@ -66,6 +72,7 @@ public class CSVMaker implements Runnable {
     public void run() {
         runVeins();
         runSmallOres();
+        runVoidMiner();
     }
 
     private static String getBWOreName(short meta) {
@@ -130,5 +137,20 @@ public class CSVMaker implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void runVoidMiner() {
+        BufferedWriter one = Files.newBufferedWriter(
+                GTNEIOrePlugin.instanceDir.toPath()
+                    .resolve("VoidMiner.csv"));
+    }
+
+    private static Map<String, String> map_ItemID_ItemName = new HashMap<>();
+    private static String solveDropMap() {
+        
+    }
+
+    private static class VoidMinerLine {
+        
     }
 }
