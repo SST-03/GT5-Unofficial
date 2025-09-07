@@ -1,6 +1,7 @@
 package gtneioreplugin.util;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -140,7 +141,7 @@ public class CSVMaker implements Runnable {
         }
     }
 
-    private void runVoidMiner() throws Exception {
+    private void runVoidMiner() throws IOException {
         BufferedWriter one = Files.newBufferedWriter(
                 GTNEIOrePlugin.instanceDir.toPath()
                     .resolve("VoidMiner.csv"));
@@ -182,7 +183,7 @@ public class CSVMaker implements Runnable {
 
     private static Map<String, String> map_ItemID_ItemName = new HashMap<>();
     
-    private static void solveDropMap(BufferedWriter one, VoidMinerUtility.DropMap map) throws Exception {
+    private static void solveDropMap(BufferedWriter one, VoidMinerUtility.DropMap map) throws IOException {
         map.getInternalMap().forEach((GTItemId, weight) -> {
             String unLocName = GTItemId.getItemStack().getUnlocalizedName();
             map_ItemID_ItemName.putIfAbsent(unLocName, GTItemId.getItemStack().getDisplayName());
