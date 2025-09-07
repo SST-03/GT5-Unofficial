@@ -149,48 +149,54 @@ public class CSVMaker implements Runnable {
         one.write(new VoidMinerLine("Item", "Weight").toString());
         one.newLine();
         
-        dropMapsByDimId.forEach((dimID, map) -> {
-            one.write(new VoidMinerLine("!!dimID!!", dimID.toString()).toString());
+        Iterator<Map.Entry<Integer, VoidMinerUtility.DropMap>> it = dropMapsByDimId.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Integer, VoidMinerUtility.DropMap> entry = it.next();
+            one.write(new VoidMinerLine("!!dimID!!", entry.getKey().toString()).toString());
             one.newLine();
             
-            List<String> list = solveDropMap(one, map);
-            list.forEach((line) -> {
+            for (String line : solveDropMap(one, entry.getValue())){
                 one.write(line);
                 one.newLine();
-            });
-        });
+            }
+        }
 
-        dropMapsByChunkProviderName.forEach((chunkProviderName, map) -> {
-            one.write(new VoidMinerLine("chunkProviderName", chunkProviderName).toString());
+        Iterator<Map.Entry<String, VoidMinerUtility.DropMap>> it2 = dropMapsByChunkProviderName.entrySet().iterator();
+        while (it2.hasNext()) {
+            Map.Entry<String, VoidMinerUtility.DropMap> entry = it2.next();
+            one.write(new VoidMinerLine("chunkProviderName", entry.getKey()).toString());
             one.newLine();
             
-            List<String> list = solveDropMap(one, map);
-            list.forEach((line) -> {
+            for (String line : solveDropMap(one, entry.getValue())){
                 one.write(line);
                 one.newLine();
-            });
-        });
+            }
+        }
 
-        extraDropsDimMap.forEach((dimID, map) -> {
-            one.write(new VoidMinerLine("EXTRA!!dimID!!", dimID.toString()).toString());
+        Iterator<Map.Entry<Integer, VoidMinerUtility.DropMap>> it3 = extraDropsDimMap.entrySet().iterator();
+        while (it3.hasNext()) {
+            Map.Entry<Integer, VoidMinerUtility.DropMap> entry = it3.next();
+            one.write(new VoidMinerLine("EXTRA!!dimID!!", entry.getKey().toString()).toString());
             one.newLine();
             
-            List<String> list = solveDropMap(one, map);
-            list.forEach((line) -> {
+            for (String line : solveDropMap(one, entry.getValue())){
                 one.write(line);
                 one.newLine();
-            });
-        });
+            }
+        }
 
         one.write(new VoidMinerLine("", "").toString());
         one.newLine();
 
         one.write(new VoidMinerLine("Item", "Name").toString());
         one.newLine();
-        map_ItemID_ItemName.forEach((itemID, name) -> {
-            one.write(new VoidMinerLine(itemID, name).toString());
+
+        Iterator<Map.Entry<String, String>> it4 = map_ItemID_ItemName.entrySet().iterator();
+        while (it4.hasNext()) {
+            Map.Entry<String, String> entry = it4.next();
+            one.write(new VoidMinerLine(entry.getKey(), entry.getValue()).toString());
             one.newLine();
-        });
+        }
 
         one.flush();
         one.close();
