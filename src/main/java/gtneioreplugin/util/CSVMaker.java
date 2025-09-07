@@ -141,7 +141,7 @@ public class CSVMaker implements Runnable {
         }
     }
 
-    private void runVoidMiner() {
+    public void runVoidMiner() {
       try {
 
         BufferedWriter one = Files.newBufferedWriter(
