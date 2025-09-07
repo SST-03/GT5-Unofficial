@@ -36,7 +36,6 @@ import gregtech.api.objects.DiscreteDistribution;
 import gregtech.api.util.GTUtility;
 import gregtech.common.WorldgenGTOreLayer;
 import gregtech.common.WorldgenGTOreSmallPieces;
-import gtneioreplugin.util.CSVMaker;
 
 public class VoidMinerUtility {
 
@@ -207,7 +206,6 @@ public class VoidMinerUtility {
             }
         }
 
-        new CSVMaker().runVoidMiner();
     }
 
     /**
