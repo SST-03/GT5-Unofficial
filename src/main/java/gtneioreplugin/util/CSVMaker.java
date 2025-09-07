@@ -74,7 +74,7 @@ public class CSVMaker implements Runnable {
     public void run() {
         runVeins();
         runSmallOres();
-        try {runVoidMiner();} catch (Exception e) {e.printStackTrace();}
+        runVoidMiner();
     }
 
     private static String getBWOreName(short meta) {
@@ -141,7 +141,7 @@ public class CSVMaker implements Runnable {
         }
     }
 
-    private void runVoidMiner() throws IOException {try {
+    private void runVoidMiner() {try {
         BufferedWriter one = Files.newBufferedWriter(
                 GTNEIOrePlugin.instanceDir.toPath()
                     .resolve("VoidMiner.csv"));
@@ -152,19 +152,34 @@ public class CSVMaker implements Runnable {
         dropMapsByDimId.forEach((dimID, map) -> {
             one.write(new VoidMinerLine("!!dimID!!", dimID.toString()).toString());
             one.newLine();
-            solveDropMap(one, map);
+            
+            List<VoidMinerLine> list = solveDropMap(one, map);
+            list.forEach((line) -> {
+                one.write(line.toString());
+                one.newLine();
+            });
         });
 
         dropMapsByChunkProviderName.forEach((chunkProviderName, map) -> {
             one.write(new VoidMinerLine("chunkProviderName", chunkProviderName).toString());
             one.newLine();
-            solveDropMap(one, map);
+            
+            List<VoidMinerLine> list = solveDropMap(one, map);
+            list.forEach((line) -> {
+                one.write(line.toString());
+                one.newLine();
+            });
         });
 
         extraDropsDimMap.forEach((dimID, map) -> {
             one.write(new VoidMinerLine("EXTRA!!dimID!!", dimID.toString()).toString());
             one.newLine();
-            solveDropMap(one, map);
+            
+            List<VoidMinerLine> list = solveDropMap(one, map);
+            list.forEach((line) -> {
+                one.write(line.toString());
+                one.newLine();
+            });
         });
 
         one.write(new VoidMinerLine("", "").toString());
@@ -184,15 +199,16 @@ public class CSVMaker implements Runnable {
 
     private static Map<String, String> map_ItemID_ItemName = new HashMap<>();
     
-    private static void solveDropMap(BufferedWriter one, VoidMinerUtility.DropMap map) throws IOException {
-        try{
+    private static List<VoidMinerLine> solveDropMap(BufferedWriter one, VoidMinerUtility.DropMap map) {
+        List<VoidMinerLine> list = new ArrayList<>();
+
         map.getInternalMap().forEach((GTItemId, weight) -> {
             String unLocName = GTItemId.getItemStack().getUnlocalizedName();
             map_ItemID_ItemName.putIfAbsent(unLocName, GTItemId.getItemStack().getDisplayName());
-            one.write(new VoidMinerLine(unLocName, weight.toString()).toString());
-            one.newLine();
+            list.add(new VoidMinerLine(unLocName, weight.toString()).toString());
         });
-        } catch (IOException e) {throw new IOException(e);}
+
+        return list;
     }
 
     private static class VoidMinerLine {
