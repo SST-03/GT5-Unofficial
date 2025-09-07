@@ -12,6 +12,7 @@ import java.util.HashMap;
 import bartworks.system.material.Werkstoff;
 import bwcrossmod.galacticgreg.VoidMinerUtility;
 import gregtech.api.util.GTLanguageManager;
+import gregtech.api.util.GTUtility;
 import gtneioreplugin.Config;
 import gtneioreplugin.GTNEIOrePlugin;
 import gtneioreplugin.plugin.gregtech5.PluginGT5VeinStat;
@@ -143,14 +144,62 @@ public class CSVMaker implements Runnable {
         BufferedWriter one = Files.newBufferedWriter(
                 GTNEIOrePlugin.instanceDir.toPath()
                     .resolve("VoidMiner.csv"));
+
+        one.write(new VoidMinerLine("Item", "Weight").toString());
+        one.newLine();
+        
+        dropMapsByDimId.forEach((dimID, map) -> {
+            one.write(new VoidMinerLine("!!dimID!!", dimID.toString()).toString());
+            one.newLine();
+            solveDropMap(one, map);
+        });
+
+        dropMapsByChunkProviderName.forEach((chunkProviderName, map) -> {
+            one.write(new VoidMinerLine("chunkProviderName", chunkProviderName).toString());
+            one.newLine();
+            solveDropMap(one, map);
+        });
+
+        extraDropsDimMap.forEach((dimID, map) -> {
+            one.write(new VoidMinerLine("EXTRA!!dimID!!", dimID.toString()).toString());
+            one.newLine();
+            solveDropMap(one, map);
+        });
+
+        one.write(new VoidMinerLine("", "").toString());
+        one.newLine();
+
+        one.write(new VoidMinerLine("Item", "Name").toString());
+        one.newLine();
+        map_ItemID_ItemName.forEach((itemID, name) -> {
+            one.write(new VoidMinerLine(itemID, name).toString());
+            one.newLine();
+        });
+
+        one.flush();
+        one.close();
     }
 
     private static Map<String, String> map_ItemID_ItemName = new HashMap<>();
-    private static String solveDropMap() {
-        
+    
+    private static void solveDropMap(BufferedWriter one, DropMap map) {
+        map.getInternalMap().forEach((GTItemId, weight) -> {
+            String unLocName = GTItemId.getItemStack().getUnlocalizedName();
+            map_ItemID_ItemName.putIfAbsent(unLocName, GTItemId.getItemStack().getDisplayName());
+            one.write(new VoidMinerLine(unLocName, weight.toString()).toString());
+            one.newLine();
+        });
     }
 
     private static class VoidMinerLine {
+        public String[2] values;
+        public VoidMinerLine(String a, String b){
+            this.values = {a,b};
+        }
         
+        @Override
+        public String toString(){
+            return String.join(",", values);
+        }
     }
 }
