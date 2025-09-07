@@ -16,6 +16,7 @@ import galacticgreg.auxiliary.LogHelper;
 import galacticgreg.auxiliary.ProfilingStorage;
 import galacticgreg.command.AEStorageCommand;
 import galacticgreg.command.ProfilingCommand;
+import galacticgreg.command.ExportVmCsvCommand;
 import galacticgreg.registry.GalacticGregRegistry;
 import galacticgreg.schematics.SpaceSchematicHandler;
 import gregtech.GT_Version;
@@ -107,7 +108,7 @@ public class GalacticGreg {
 
         if (AppliedEnergistics2.isModLoaded() && GalacticConfig.EnableAEExportCommand
             && GalacticConfig.SchematicsEnabled) pEvent.registerServerCommand(new AEStorageCommand());
-
+        pEvent.registerServerCommand(new ExportVmCsvCommand());
         Logger.trace("Leaving SERVERLOAD");
     }
 }
