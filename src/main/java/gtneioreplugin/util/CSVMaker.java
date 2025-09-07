@@ -192,9 +192,10 @@ public class CSVMaker implements Runnable {
     }
 
     private static class VoidMinerLine {
-        public String[2] values;
+        public String[] values = new String[2];
         public VoidMinerLine(String a, String b){
-            this.values = {a,b};
+            this.values[0] = a;
+            this.values[1] = b;
         }
         
         @Override
