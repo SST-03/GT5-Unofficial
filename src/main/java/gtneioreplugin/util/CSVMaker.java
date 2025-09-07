@@ -141,7 +141,9 @@ public class CSVMaker implements Runnable {
         }
     }
 
-    private void runVoidMiner() {try {
+    private void runVoidMiner() {
+      try {
+
         BufferedWriter one = Files.newBufferedWriter(
                 GTNEIOrePlugin.instanceDir.toPath()
                     .resolve("VoidMiner.csv"));
@@ -200,7 +202,8 @@ public class CSVMaker implements Runnable {
 
         one.flush();
         one.close();
-        } catch (IOException e) {throw new IOException(e);}
+
+      } catch (Exception e) {e.printStackTrace();}
     }
 
     private static Map<String, String> map_ItemID_ItemName = new HashMap<>();
