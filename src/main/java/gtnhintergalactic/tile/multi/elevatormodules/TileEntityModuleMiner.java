@@ -1037,7 +1037,7 @@ public abstract class TileEntityModuleMiner extends TileEntityModuleBase impleme
                         GTMod.GT_FML_LOGGER.error(
                             "Left = " + leftStr 
                             + ", Right = " + rightStr + "|" 
-                            + String.valueOf(rightStr.hashCode() == "AsteroidOutpost") 
+                            + String.valueOf(rightStr.hashCode() == "AsteroidOutpost".hashCode()) 
                             + "|"
                             + String.valueOf(key.getLeft().hashCode() == SolarSystem.KuiperBelt.hashCode())
                             );
