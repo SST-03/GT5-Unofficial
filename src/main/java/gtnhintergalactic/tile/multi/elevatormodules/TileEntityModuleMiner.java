@@ -1029,7 +1029,12 @@ public abstract class TileEntityModuleMiner extends TileEntityModuleBase impleme
                 if (map == null) {
                     GTMod.GT_FML_LOGGER.error("cannot find from UUID" + leader.toString());
                 }
-                else {GTMod.GT_FML_LOGGER.error("So maybe map doesnt contain value?");}
+                else {
+                    GTMod.GT_FML_LOGGER.error("So maybe map doesnt contain value? is pos equal to getLoc: " 
+                                              + String.valueOf(SolarSystem.KuiperBelt.equals(SpaceProjectManager.getLocation("KuiperBelt")))
+                                              + String.valueOf(SpaceProjectManager.getLocation("KuiperBelt").equals(SolarSystem.KuiperBelt))
+                                             );
+                }
             }
         }
         return true;
