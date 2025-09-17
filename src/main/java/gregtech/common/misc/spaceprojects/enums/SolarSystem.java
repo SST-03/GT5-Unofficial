@@ -101,4 +101,9 @@ public enum SolarSystem implements ISpaceBody {
     public String getUnlocalizedName() {
         return "gt.solar.system." + getName().toLowerCase();
     }
+
+    @Override
+    public int hashCode() {
+        return getName().hashCode();
+    }
 }
