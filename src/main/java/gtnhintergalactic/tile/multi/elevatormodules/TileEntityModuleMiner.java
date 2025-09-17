@@ -1007,7 +1007,7 @@ public abstract class TileEntityModuleMiner extends TileEntityModuleBase impleme
         }
 
         UUID _uuid = getBaseMetaTileEntity().getOwnerUuid();
-        if (SpaceProjectManager.teamHasProject(_uuid, ASTEROID_OUTPOST)) {
+        if (SpaceProjectManager.teamHasProject2(_uuid, SolarSystem.KuiperBelt, "AsteroidOutpost")) {
             ISpaceProject proj = SpaceProjectManager
                 .getTeamProject(getBaseMetaTileEntity().getOwnerUuid(), SolarSystem.KuiperBelt, "AsteroidOutpost");
             if (proj.isFinished()) {
