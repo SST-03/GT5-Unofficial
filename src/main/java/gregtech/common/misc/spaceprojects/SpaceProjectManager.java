@@ -86,9 +86,10 @@ public class SpaceProjectManager {
 
     /**
      * Check whether a team has a project or not
+     * This method has BUG, DONT USE IT (Well this is a test branch so u know)
      *
      * @param member  Member of the team
-     * @param project The project, which you are checking for. This only compares the internal names of the project.
+     * @param project The project, which you are checking for. This only compares the internal names of the project. Well due to some reasons it doesn't work.
      * @return True if the team has said project, false otherwise
      */
     public static boolean teamHasProject(UUID member, ISpaceProject project) {
@@ -98,6 +99,23 @@ public class SpaceProjectManager {
         }
 
         return map.containsValue(project);
+    }
+
+    /**
+     * Check whether a team has a project or not
+     *
+     * @param member  Member of the team
+     * @param planet The planet of project
+     * @param research The research name of project
+     * @return True if the team has said project, false otherwise
+     */
+    public static boolean teamHasProject2(UUID member, ISpaceBody planet, String research) {
+        Map<Pair<ISpaceBody, String>, ISpaceProject> map = spaceTeamProjects.get(getLeader(member));
+        if (map == null) {
+            return false;
+        }
+
+        return map.containsKey(Pair.of(planet,research));
     }
 
     /**
