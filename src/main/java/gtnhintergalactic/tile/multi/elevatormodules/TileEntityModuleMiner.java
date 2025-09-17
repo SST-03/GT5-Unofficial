@@ -1024,7 +1024,7 @@ public abstract class TileEntityModuleMiner extends TileEntityModuleBase impleme
             else {
                 GTMod.GT_FML_LOGGER.error("spaceTeamProjects: " + spaceTeamProjects.toString());
 
-                UUID leader = SpaceProjectManager.getLeader(_uuid)
+                UUID leader = SpaceProjectManager.getLeader(_uuid);
                 Map<Pair<ISpaceBody, String>, ISpaceProject> map = spaceTeamProjects.get(leader);
                 if (map == null) {
                     GTMod.GT_FML_LOGGER.error("cannot find from UUID" + leader.toString());
