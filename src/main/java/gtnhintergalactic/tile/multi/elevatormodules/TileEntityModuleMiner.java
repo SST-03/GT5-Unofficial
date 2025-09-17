@@ -81,6 +81,7 @@ import tectech.thing.metaTileEntity.multi.base.LedStatus;
 import tectech.thing.metaTileEntity.multi.base.Parameters;
 import tectech.thing.metaTileEntity.multi.base.render.TTRenderedExtendedFacingTexture;
 
+import gregtech.GTMod;
 /**
  * Base class for space mining modules
  *
@@ -1006,8 +1007,12 @@ public abstract class TileEntityModuleMiner extends TileEntityModuleBase impleme
                 .getTeamProject(getBaseMetaTileEntity().getOwnerUuid(), SolarSystem.KuiperBelt, "AsteroidOutpost");
             if (proj.isFinished()) {
                 asteroidOutpost = (ProjectAsteroidOutpost) proj;
+                GTMod.GT_FML_LOGGER.error("Project finished");
+                if (asteroidOutpost == null){GTMod.GT_FML_LOGGER.error("Project is null???");}
+            } else {
+                GTMod.GT_FML_LOGGER.error(String.format("Project didnt finish. %d/%d",proj.getCurrentStage(),proj.getTotalStages()));
             }
-        }
+        } else {GTMod.GT_FML_LOGGER.error("I Dont think there is a project here.");}
         return true;
     }
 
