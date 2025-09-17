@@ -1030,9 +1030,17 @@ public abstract class TileEntityModuleMiner extends TileEntityModuleBase impleme
                     GTMod.GT_FML_LOGGER.error("cannot find from UUID" + leader.toString());
                 }
                 else {
-                    GTMod.GT_FML_LOGGER.error("So maybe map doesnt contain value? is pos equal to getLoc: " 
-                                              + String.valueOf(SolarSystem.KuiperBelt.hashCode() == SpaceProjectManager.getLocation("KuiperBelt").hashCode())
-                                             );
+                    GTMod.GT_FML_LOGGER.error("So maybe map doesnt contain value?");
+                    for (Pair<ISpaceBody, String> key : map.keySet()) {
+                        String leftStr = key.getLeft().getName();
+                        String rightStr = key.getRight();
+                        GTMod.GT_FML_LOGGER.error(
+                            "Left = " + leftStr 
+                            + ", Right = " + rightStr + "|" 
+                            + String.valueOf(rightStr.hashCode() == "AsteroidOutpost") 
+                            + "|"
+                            + String.valueOf(key.getLeft().hashCode() == SolarSystem.KuiperBelt.hashCode());
+                    }
                 }
             }
         }
