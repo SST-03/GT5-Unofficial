@@ -82,6 +82,9 @@ import tectech.thing.metaTileEntity.multi.base.Parameters;
 import tectech.thing.metaTileEntity.multi.base.render.TTRenderedExtendedFacingTexture;
 
 import gregtech.GTMod;
+import java.util.UUID;
+import org.apache.commons.lang3.tuple.Pair;
+import gregtech.common.misc.spaceprojects.interfaces.ISpaceBody;
 /**
  * Base class for space mining modules
  *
