@@ -1012,7 +1012,14 @@ public abstract class TileEntityModuleMiner extends TileEntityModuleBase impleme
             } else {
                 GTMod.GT_FML_LOGGER.error(String.format("Project didnt finish. %d/%d",proj.getCurrentStage(),proj.getTotalStages()));
             }
-        } else {GTMod.GT_FML_LOGGER.error("I Dont think there is a project here.");}
+        } else {
+            GTMod.GT_FML_LOGGER.error("I Dont think there is a project here.");
+            Map<UUID, Map<Pair<ISpaceBody, String>, ISpaceProject>> spaceTeamProjects = SpaceProjectManager.spaceTeamProjects;
+            if (spaceTeamProjects == null) {GTMod.GT_FML_LOGGER.error("Bro why it is null");}
+            else {
+                GTMod.GT_FML_LOGGER.error("spaceTeamProjects: " + spaceTeamProjects.toString());
+            }
+        }
         return true;
     }
 
