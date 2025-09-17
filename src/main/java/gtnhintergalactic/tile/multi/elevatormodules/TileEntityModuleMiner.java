@@ -1039,7 +1039,8 @@ public abstract class TileEntityModuleMiner extends TileEntityModuleBase impleme
                             + ", Right = " + rightStr + "|" 
                             + String.valueOf(rightStr.hashCode() == "AsteroidOutpost") 
                             + "|"
-                            + String.valueOf(key.getLeft().hashCode() == SolarSystem.KuiperBelt.hashCode());
+                            + String.valueOf(key.getLeft().hashCode() == SolarSystem.KuiperBelt.hashCode())
+                            );
                     }
                 }
             }
