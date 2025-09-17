@@ -1031,8 +1031,7 @@ public abstract class TileEntityModuleMiner extends TileEntityModuleBase impleme
                 }
                 else {
                     GTMod.GT_FML_LOGGER.error("So maybe map doesnt contain value? is pos equal to getLoc: " 
-                                              + String.valueOf(SolarSystem.KuiperBelt.equals(SpaceProjectManager.getLocation("KuiperBelt")))
-                                              + String.valueOf(SpaceProjectManager.getLocation("KuiperBelt").equals(SolarSystem.KuiperBelt))
+                                              + String.valueOf(SolarSystem.KuiperBelt.hashCode() == SpaceProjectManager.getLocation("KuiperBelt").hashCode())
                                              );
                 }
             }
