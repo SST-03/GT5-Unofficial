@@ -1005,7 +1005,9 @@ public abstract class TileEntityModuleMiner extends TileEntityModuleBase impleme
             wasFilterModified = false;
             generateOreConfigurationList();
         }
-        if (SpaceProjectManager.teamHasProject(getBaseMetaTileEntity().getOwnerUuid(), ASTEROID_OUTPOST)) {
+
+        UUID _uuid = getBaseMetaTileEntity().getOwnerUuid();
+        if (SpaceProjectManager.teamHasProject(_uuid, ASTEROID_OUTPOST)) {
             ISpaceProject proj = SpaceProjectManager
                 .getTeamProject(getBaseMetaTileEntity().getOwnerUuid(), SolarSystem.KuiperBelt, "AsteroidOutpost");
             if (proj.isFinished()) {
@@ -1021,6 +1023,13 @@ public abstract class TileEntityModuleMiner extends TileEntityModuleBase impleme
             if (spaceTeamProjects == null) {GTMod.GT_FML_LOGGER.error("Bro why it is null");}
             else {
                 GTMod.GT_FML_LOGGER.error("spaceTeamProjects: " + spaceTeamProjects.toString());
+
+                UUID leader = SpaceProjectManager.getLeader(_uuid)
+                Map<Pair<ISpaceBody, String>, ISpaceProject> map = spaceTeamProjects.get(leader);
+                if (map == null) {
+                    GTMod.GT_FML_LOGGER.error("cannot find from UUID" + leader.toString());
+                }
+                else {GTMod.GT_FML_LOGGER.error("So maybe map doesnt contain value?");}
             }
         }
         return true;
