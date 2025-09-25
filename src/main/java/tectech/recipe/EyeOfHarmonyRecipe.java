@@ -360,8 +360,10 @@ public class EyeOfHarmonyRecipe {
 
         int index = 0;
         for (Materials byProductMaterial : material.mOreByProducts) {
-            outputMap
-                .add(byProductMaterial.mDirectSmelting, mainMultiplier * (ORE_MULTIPLIER[index++] * 2) * probability);
+            index++;
+            if (index < 3) outputMap
+                .add(byProductMaterial.mDirectSmelting, mainMultiplier * (ORE_MULTIPLIER[index] * 2) * probability);
+            // For Materials that index is > 3, normally they will not be used (unless using Chem bath).
 
             // Will never duplicate since mOreByProducts does not support duplicate.
             if (byProductMaterial.contains(SubTag.WASHING_MERCURY_99_PERCENT)) outputMap
