@@ -2062,6 +2062,7 @@ public class WerkstoffLoader {
                 registration.run(werkstoff);
             }
         }
+        addOreByProductsForBridgeMaterials();
         addFakeItemDataToInWorldBlocksAndCleanUpFakeData();
     }
 
@@ -2085,6 +2086,20 @@ public class WerkstoffLoader {
             .remove("bwsmallores");
         Materials.getMaterialsMap()
             .remove("bwblocks");
+    }
+
+    private static void addOreByProductsForBridgeMaterials() {
+        for (Werkstoff werkstoff : Werkstoff.werkstoffHashSet) {
+            Materials bridgeMaterial = werkstoff.getBridgeMaterial();
+            for (ISubTagContainer material : werkstoff.mOreByProducts) {
+                if (material == null) throw new NullPointerException();
+                else if (material instanceof Materials) bridgeMaterial.addOreByProduct(((Materials) material));
+                else if (material instanceof Werkstoff) bridgeMaterial.addOreByProduct(((Werkstoff) material).getBridgeMaterial());
+                else throw new ClassCastException();
+            }
+            if (bridgeMaterial.addOreByProduct.size() < 3) bridgeMaterial.addOreByProduct(werkstoff.getBridgeMaterial());
+            // So it should be the same to Materials' mOreByProducts.
+        }
     }
 
     public static void removeIC2Recipes() {
