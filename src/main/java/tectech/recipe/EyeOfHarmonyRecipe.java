@@ -28,6 +28,7 @@ import gregtech.api.enums.MaterialsUEVplus;
 import gregtech.api.enums.OrePrefixes;
 import gregtech.api.enums.SubTag;
 import gregtech.api.util.GTOreDictUnificator;
+import gregtech.api.util.GTUtility;
 import gtneioreplugin.plugin.block.BlockDimensionDisplay;
 import gtneioreplugin.util.GT5OreLayerHelper;
 import gtneioreplugin.util.GT5OreSmallHelper;
@@ -346,10 +347,9 @@ public class EyeOfHarmonyRecipe {
         if (material.contains(SubTag.ELECTROMAGNETIC_SEPERATION_NEODYMIUM)) outputMap.add(Materials.Neodymium, mainMultiplier * (ELECTROMAGNETIC_MULTIPLIER * 2) * probability);
 
         if (material.mOreByProducts.size() == 0) {
-            Materials m = material.mMacerateInto;
-            if (m.contains(SubTag.WASHING_MERCURY_99_PERCENT)) outputMap.add(m.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER99 * 2) * probability);
-            else if (m.contains(SubTag.WASHING_MERCURY)) outputMap.add(m.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
-            else if (m.contains(SubTag.WASHING_SODIUMPERSULFATE)) outputMap.add(m.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
+            if (material.contains(SubTag.WASHING_MERCURY_99_PERCENT)) outputMap.add(material.mDirectSmelting, mainMultiplier * (QUATERNARY99_MULTIPLIER * 2) * probability);
+            else if (material.contains(SubTag.WASHING_MERCURY)) outputMap.add(material.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
+            else if (material.contains(SubTag.WASHING_SODIUMPERSULFATE)) outputMap.add(material.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
         }
         
         int index = 0;
@@ -358,7 +358,7 @@ public class EyeOfHarmonyRecipe {
                 .add(byProductMaterial.mDirectSmelting, mainMultiplier * (ORE_MULTIPLIER[index++] * 2) * probability);
 
             //Will never duplicate since mOreByProducts does not support duplicate.
-            if (byProductMaterial.contains(SubTag.WASHING_MERCURY_99_PERCENT)) outputMap.add(byProductMaterial.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER99 * 2) * probability);
+            if (byProductMaterial.contains(SubTag.WASHING_MERCURY_99_PERCENT)) outputMap.add(byProductMaterial.mDirectSmelting, mainMultiplier * (QUATERNARY99_MULTIPLIER * 2) * probability);
             else if (byProductMaterial.contains(SubTag.WASHING_MERCURY)) outputMap.add(byProductMaterial.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
             else if (byProductMaterial.contains(SubTag.WASHING_SODIUMPERSULFATE)) outputMap.add(byProductMaterial.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
         }
