@@ -17,6 +17,8 @@ import com.gtnewhorizon.gtnhlib.util.CoordinatePacker;
 import gregtech.GTMod;
 import gregtech.api.GregTechAPI;
 import gregtech.api.interfaces.tileentity.IMachineBlockUpdateable;
+import gregtech.api.metatileentity.BaseMetaPipeEntity;
+import gregtech.common.config.Gregtech;
 import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -173,6 +175,10 @@ public class RunnableMachineUpdate implements Runnable {
                 // See if the block itself needs an update
                 if (tTileEntity instanceof IMachineBlockUpdateable)
                     ((IMachineBlockUpdateable) tTileEntity).onMachineBlockUpdate();
+
+                // Skip propagation through pipes\cables\etc as they have their own RunnableCableUpdate
+                if (Gregtech.features.speedupMachineUpdateThread && (tTileEntity instanceof BaseMetaPipeEntity))
+                    continue;
 
                 // Now see if we should add the nearby blocks to the queue:
                 // 1) If we've visited less than 5 blocks, then yes
