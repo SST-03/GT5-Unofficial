@@ -316,7 +316,7 @@ public class EyeOfHarmonyRecipe {
     private static final double TERTIARY_MULTIPLIER = (0.1); // Macerating thermal centrifuged byproduct chance.
     private static final double QUATERNARY_MULTIPLIER = (0.7); // Mercury/chem bath processing chance.
     private static final double QUATERNARY99_MULTIPLIER = (0.99); // Mercury/chem bath processing chance.
-    private static final double ELECTROMAGNETIC_MULTIPLIER = (0.4 / 4.0 + 0.2 / 9.0); //MagneticSep. processing chance.
+    private static final double ELECTROMAGNETIC_MULTIPLIER = (0.4 / 4.0 + 0.2 / 9.0); // MagneticSep. processing chance.
 
     private static final double[] ORE_MULTIPLIER = { PRIMARY_MULTIPLIER, SECONDARY_MULTIPLIER, TERTIARY_MULTIPLIER };
 
@@ -342,32 +342,41 @@ public class EyeOfHarmonyRecipe {
         if (material == null) return;
         outputMap.add(material.mDirectSmelting, (material.mOreMultiplier * 2) * mainMultiplier * probability);
 
-        if (material.contains(SubTag.ELECTROMAGNETIC_SEPERATION_GOLD)) outputMap.add(Materials.Gold, mainMultiplier * (ELECTROMAGNETIC_MULTIPLIER * 2) * probability);
-        if (material.contains(SubTag.ELECTROMAGNETIC_SEPERATION_IRON)) outputMap.add(Materials.Iron, mainMultiplier * (ELECTROMAGNETIC_MULTIPLIER * 2) * probability);
-        if (material.contains(SubTag.ELECTROMAGNETIC_SEPERATION_NEODYMIUM)) outputMap.add(Materials.Neodymium, mainMultiplier * (ELECTROMAGNETIC_MULTIPLIER * 2) * probability);
+        if (material.contains(SubTag.ELECTROMAGNETIC_SEPERATION_GOLD))
+            outputMap.add(Materials.Gold, mainMultiplier * (ELECTROMAGNETIC_MULTIPLIER * 2) * probability);
+        if (material.contains(SubTag.ELECTROMAGNETIC_SEPERATION_IRON))
+            outputMap.add(Materials.Iron, mainMultiplier * (ELECTROMAGNETIC_MULTIPLIER * 2) * probability);
+        if (material.contains(SubTag.ELECTROMAGNETIC_SEPERATION_NEODYMIUM))
+            outputMap.add(Materials.Neodymium, mainMultiplier * (ELECTROMAGNETIC_MULTIPLIER * 2) * probability);
 
         if (material.mOreByProducts.size() == 0) {
-            if (material.contains(SubTag.WASHING_MERCURY_99_PERCENT)) outputMap.add(material.mDirectSmelting, mainMultiplier * (QUATERNARY99_MULTIPLIER * 2) * probability);
-            else if (material.contains(SubTag.WASHING_MERCURY)) outputMap.add(material.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
-            else if (material.contains(SubTag.WASHING_SODIUMPERSULFATE)) outputMap.add(material.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
+            if (material.contains(SubTag.WASHING_MERCURY_99_PERCENT))
+                outputMap.add(material.mDirectSmelting, mainMultiplier * (QUATERNARY99_MULTIPLIER * 2) * probability);
+            else if (material.contains(SubTag.WASHING_MERCURY))
+                outputMap.add(material.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
+            else if (material.contains(SubTag.WASHING_SODIUMPERSULFATE))
+                outputMap.add(material.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
         }
-        
+
         int index = 0;
         for (Materials byProductMaterial : material.mOreByProducts) {
             outputMap
                 .add(byProductMaterial.mDirectSmelting, mainMultiplier * (ORE_MULTIPLIER[index++] * 2) * probability);
 
-            //Will never duplicate since mOreByProducts does not support duplicate.
-            if (byProductMaterial.contains(SubTag.WASHING_MERCURY_99_PERCENT)) outputMap.add(byProductMaterial.mDirectSmelting, mainMultiplier * (QUATERNARY99_MULTIPLIER * 2) * probability);
-            else if (byProductMaterial.contains(SubTag.WASHING_MERCURY)) outputMap.add(byProductMaterial.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
-            else if (byProductMaterial.contains(SubTag.WASHING_SODIUMPERSULFATE)) outputMap.add(byProductMaterial.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
+            // Will never duplicate since mOreByProducts does not support duplicate.
+            if (byProductMaterial.contains(SubTag.WASHING_MERCURY_99_PERCENT)) outputMap
+                .add(byProductMaterial.mDirectSmelting, mainMultiplier * (QUATERNARY99_MULTIPLIER * 2) * probability);
+            else if (byProductMaterial.contains(SubTag.WASHING_MERCURY)) outputMap
+                .add(byProductMaterial.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
+            else if (byProductMaterial.contains(SubTag.WASHING_SODIUMPERSULFATE)) outputMap
+                .add(byProductMaterial.mDirectSmelting, mainMultiplier * (QUATERNARY_MULTIPLIER * 2) * probability);
         }
 
         for (int i = index; i < 3; i++) {
-            Materials byProductMaterial = GTUtility.selectItemInList(i, material.mMacerateInto, material.mOreByProducts);
-            outputMap
-                .add(byProductMaterial.mDirectSmelting, mainMultiplier * (ORE_MULTIPLIER[i] * 2) * probability);
-            //Since it's duplicate, do not check if it can Mercury/chem bath.
+            Materials byProductMaterial = GTUtility
+                .selectItemInList(i, material.mMacerateInto, material.mOreByProducts);
+            outputMap.add(byProductMaterial.mDirectSmelting, mainMultiplier * (ORE_MULTIPLIER[i] * 2) * probability);
+            // Since it's duplicate, do not check if it can Mercury/chem bath.
         }
     }
 
