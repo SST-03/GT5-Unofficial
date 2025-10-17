@@ -37,10 +37,12 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemShears;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.EnumChatFormatting;
 
 import com.gtnewhorizon.structurelib.alignment.constructable.ISurvivalConstructable;
@@ -48,6 +50,8 @@ import com.gtnewhorizon.structurelib.structure.IStructureDefinition;
 import com.gtnewhorizon.structurelib.structure.ISurvivalBuildEnvironment;
 import com.gtnewhorizon.structurelib.structure.StructureDefinition;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import forestry.api.arboriculture.IToolGrafter;
 import forestry.api.arboriculture.ITree;
 import forestry.api.arboriculture.TreeManager;
@@ -486,7 +490,7 @@ public class MTETreeFarm extends GTPPMultiBlockBase<MTETreeFarm> implements ISur
      *
      * @return The sapling that was found (now in the controller slot).
      */
-    private ItemStack findSapling() {
+    protected ItemStack findSapling() { // Changed to protected to make treeRender can access to it
         ItemStack controllerSlot = getControllerSlot();
 
         if (isValidSapling(controllerSlot)) {
@@ -563,7 +567,8 @@ public class MTETreeFarm extends GTPPMultiBlockBase<MTETreeFarm> implements ISur
      * @param sapling A sapling to farm.
      * @return A map of outputs for each mode. Outputs for some modes might be null.
      */
-    private static EnumMap<Mode, ItemStack> getOutputsForSapling(ItemStack sapling) {
+    protected static EnumMap<Mode, ItemStack> getOutputsForSapling(ItemStack sapling) { // Changed to make tree render
+                                                                                        // can work
         String registryName = Item.itemRegistry.getNameForObject(sapling.getItem());
         if (Forestry.isModLoaded() && "Forestry:sapling".equals(registryName)) {
             return getOutputsForForestrySapling(sapling);
@@ -811,5 +816,39 @@ public class MTETreeFarm extends GTPPMultiBlockBase<MTETreeFarm> implements ISur
 
         return GTPPRecipeMaps.treeGrowthSimulatorFakeRecipes.getAllRecipes()
             .size() > recipeCount;
+    }
+
+    /* New */
+    public TreeRender treeRender;
+
+    @Override
+    public void onPostTick(IGregTechTileEntity aBaseMetaTileEntity, long aTick) {
+        super.onPostTick(aBaseMetaTileEntity, aTick);
+        if (aBaseMetaTileEntity.isClientSide()) {
+            if (aBaseMetaTileEntity.isActive() && aTick % 40 == 0) {
+                setupTreeRenderer(aBaseMetaTileEntity, 40);
+            }
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void setupTreeRenderer(IGregTechTileEntity aBaseMetaTileEntity, int time) {
+        if (this.treeRender == null) {
+            ChunkCoordinates coords = this.getBaseMetaTileEntity()
+                .getCoords();
+            int[] abc = new int[] { 0, -2, 2 };
+            int[] xyz = new int[] { 0, 3, 0 };
+            this.getExtendedFacing()
+                .getWorldOffset(abc, xyz);
+            xyz[0] += coords.posX;
+            xyz[1] += coords.posY;
+            xyz[2] += coords.posZ;
+            this.treeRender = new TreeRender(aBaseMetaTileEntity.getWorld(), xyz[0], xyz[1], xyz[2], time);
+            this.treeRender.setMTE(this);
+        } else {
+            this.treeRender.setDead();
+            this.treeRender = new TreeRender(this.treeRender, time);
+        }
+        Minecraft.getMinecraft().effectRenderer.addEffect(this.treeRender);
     }
 }
