@@ -19,6 +19,7 @@ class GT_OverclockCalculator_UnitTest {
 
     private static final String messageDuration = "Duration Calculated Wrong";
     private static final String messageEUt = "EUt Calculated Wrong";
+    private static final String message1toc = "1toc Calculated Wrong";
 
     @Test
     void fullPerfectOverclockEBF_Test() {

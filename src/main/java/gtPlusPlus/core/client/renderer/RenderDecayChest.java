@@ -9,7 +9,9 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import at_code.TreeRender;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import gtPlusPlus.api.objects.Logger;
@@ -20,6 +22,8 @@ import gtPlusPlus.core.tileentities.general.TileEntityDecayablesChest;
 @SideOnly(Side.CLIENT)
 public class RenderDecayChest extends TileEntitySpecialRenderer {
 
+    private float ticksExisted; // Todo: if there's 2+ chest, this may be broken.
+    private boolean spin = false;
     private static final ResourceLocation mChestTexture = new ResourceLocation(
         GTPlusPlus.ID,
         "textures/blocks/TileEntities/DecayablesChest_full.png");
@@ -36,6 +40,15 @@ public class RenderDecayChest extends TileEntitySpecialRenderer {
 
     public void renderTileEntityAt(TileEntityDecayablesChest tile, double xPos, double yPos, double zPos,
         float partialTick) {
+        /* new */
+        this.ticksExisted += partialTick;
+        this.ticksExisted = this.ticksExisted % 100f;
+        this.spin = !this.spin;
+        TreeRender tr = new TreeRender(tile.xCoord, tile.yCoord, tile.zCoord);
+        tr.init(GameRegistry.makeItemStack("minecraft:sapling", 0, 1, null));
+        if (spin) tr.render((float) xPos, (float) yPos, (float) zPos, this.ticksExisted / 100f);
+        // GTLog.err.println("TreeRender working in another way");
+
         int facing = 3;
         if (tile.hasWorldObj()) {
             facing = tile.getFacing();
