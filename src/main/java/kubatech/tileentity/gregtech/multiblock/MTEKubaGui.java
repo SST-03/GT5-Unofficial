@@ -1,5 +1,7 @@
 package kubatech.tileentity.gregtech.multiblock;
 
+import static com.cleanroommc.modularui.drawable.UITexture.fullImage;
+
 import net.minecraft.util.StatCollector;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -15,8 +17,6 @@ import kubatech.Tags;
 import kubatech.api.implementations.KubaTechGTMultiBlockBase;
 import kubatech.tileentity.gregtech.multiblock.modularui2.LockableCycleButtonWidget;
 
-import static com.cleanroommc.modularui.drawable.UITexture.fullImage;
-
 public abstract class MTEKubaGui<T extends KubaTechGTMultiBlockBase<T>> extends MTEMultiBlockBaseGui<T> {
 
     public MTEKubaGui(T multiblock) {
@@ -27,6 +27,8 @@ public abstract class MTEKubaGui<T extends KubaTechGTMultiBlockBase<T>> extends 
 
         @Override
         public boolean isLocked() {
+            // Todo. Check that can this be auto Synced? If not, try to get syncManager
+            // to run syncManager.findSyncHandler("mMaxProgresstime", IntSyncValue.class);
             return multiblock.mMaxProgresstime > 0;
         }
 
@@ -44,6 +46,7 @@ public abstract class MTEKubaGui<T extends KubaTechGTMultiBlockBase<T>> extends 
 
         protected void addTranslatedLockableTooltips(RichTooltip t, String... key) {
             t.addLine(getDynamicFromI18nKey(key[0]));
+            if (isLocked()) t.addLine("GT5U.gui.button.forbidden_while_running");
             // t.addLine(getTranslationMode());
             for (int i = 1; i < key.length; i++) {
                 t.addLine(getDynamicFromI18nKey(key[i]));
@@ -59,7 +62,15 @@ public abstract class MTEKubaGui<T extends KubaTechGTMultiBlockBase<T>> extends 
                 .marginTop(4));
     }
 
-    public static UITexture getKubaUITexture16x16(String name) {
+    public static UITexture getKubaUITexture(String name) {
         return fullImage(Tags.MODID, name);
+    }
+
+    public static UITexture getKubaUITextureAlpha(String name) {
+        return UITexture.builder()
+            .location(Tags.MODID, name)
+            .nonOpaque()
+            .fullImage()
+            .build();
     }
 }

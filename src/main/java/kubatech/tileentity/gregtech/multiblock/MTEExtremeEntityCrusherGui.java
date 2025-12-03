@@ -1,9 +1,11 @@
 package kubatech.tileentity.gregtech.multiblock;
 
-import com.cleanroommc.modularui.api.drawable.IDrawable;
-import com.cleanroommc.modularui.drawable.ItemDrawable;
+import static kubatech.api.enums.ItemList.KubaFakeItemEECVoid;
+
 import net.minecraft.item.Item;
 
+import com.cleanroommc.modularui.api.drawable.IDrawable;
+import com.cleanroommc.modularui.drawable.ItemDrawable;
 import com.cleanroommc.modularui.drawable.UITexture;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.RichTooltip;
@@ -18,13 +20,11 @@ import crazypants.enderio.EnderIO;
 import gregtech.api.modularui2.GTGuiTextures;
 import kubatech.tileentity.gregtech.multiblock.modularui2.EasyBooleanSyncValue;
 
-import static kubatech.api.enums.ItemList.KubaFakeItemEECVoid;
-
 public class MTEExtremeEntityCrusherGui extends MTEKubaGui<MTEExtremeEntityCrusher> {
 
     private static final Item poweredSpawnerItem = Item.getItemFromBlock(EnderIO.blockPoweredSpawner);
-    private static final UITexture SLOT_EEC_SPAWNER = getKubaUITexture16x16("gui/slot/gray_spawner");
-    private static final UITexture SLOT_EEC_SWORD = getKubaUITexture16x16("gui/slot/gray_sword");
+    private static final UITexture SLOT_EEC_SPAWNER = getKubaUITexture("gui/slot/gray_spawner");
+    private static final UITexture SLOT_EEC_SWORD = getKubaUITexture("gui/slot/gray_sword");
 
     public MTEExtremeEntityCrusherGui(MTEExtremeEntityCrusher multiblock) {
         super(multiblock);
@@ -61,6 +61,7 @@ public class MTEExtremeEntityCrusherGui extends MTEKubaGui<MTEExtremeEntityCrush
         mCycleWeapons.registerSyncValue(syncManager);
         isInRitualMode.registerSyncValue(syncManager);
     }
+
     public final EasyBooleanSyncValue mIsProducingInfernalDrops = new EasyBooleanSyncValue(
         "mIsProducingInfernalDrops",
         multiblock::isProducingInfernalDrops,
@@ -97,46 +98,37 @@ public class MTEExtremeEntityCrusherGui extends MTEKubaGui<MTEExtremeEntityCrush
 
         protected PreserveWeaponButton(PanelSyncManager syncManager) {
             super();
-            this.baseDynamicOverlay(
-                    () -> yesNo(
-                        mPreserveWeapon,
-                        OVERLAY_BUTTON_ON,
-                        OVERLAY_BUTTON_OFF))
+            this.baseDynamicOverlay(() -> yesNo(mPreserveWeapon, OVERLAY_BUTTON_ON, OVERLAY_BUTTON_OFF))
                 .size(18, 18)
                 .syncHandler(mPreserveWeapon.name)
                 .length(2)
                 .tooltipBuilder(this::createTooltip);
         }
 
-        private static final UITexture OVERLAY_BUTTON_ON = getKubaUITexture16x16(
+        private static final UITexture OVERLAY_BUTTON_ON = getKubaUITextureAlpha(
             "gui/overlay_button/machine_mode_eec_weapon_preservation_on");
-        private static final UITexture OVERLAY_BUTTON_OFF = getKubaUITexture16x16(
+        private static final UITexture OVERLAY_BUTTON_OFF = getKubaUITexture(
             "gui/overlay_button/machine_mode_eec_weapon_preservation_off");
 
         private void createTooltip(RichTooltip t) {
-            addTranslatedLockableTooltips(
-                t,
-                "kubatech.gui.text.eec.preserve_weapon" + yesNo(mPreserveWeapon));
+            addTranslatedLockableTooltips(t, "kubatech.gui.text.eec.preserve_weapon" + yesNo(mPreserveWeapon));
         }
     }
+
     private class CycleWeaponsButton extends KubaCycleButtonWidget {
 
         protected CycleWeaponsButton(PanelSyncManager syncManager) {
             super();
-            this.baseDynamicOverlay(
-                    () -> yesNo(
-                        mCycleWeapons,
-                        OVERLAY_BUTTON_ON,
-                        OVERLAY_BUTTON_OFF))
+            this.baseDynamicOverlay(() -> yesNo(mCycleWeapons, OVERLAY_BUTTON_ON, OVERLAY_BUTTON_OFF))
                 .size(18, 18)
                 .syncHandler(mCycleWeapons.name)
                 .length(2)
                 .tooltipBuilder(this::createTooltip);
         }
 
-        private static final UITexture OVERLAY_BUTTON_ON = getKubaUITexture16x16(
+        private static final UITexture OVERLAY_BUTTON_ON = getKubaUITexture(
             "gui/overlay_button/machine_mode_eec_weapon_cycling_on");
-        private static final UITexture OVERLAY_BUTTON_OFF = getKubaUITexture16x16(
+        private static final UITexture OVERLAY_BUTTON_OFF = getKubaUITexture(
             "gui/overlay_button/machine_mode_eec_weapon_cycling_off");
 
         private void createTooltip(RichTooltip t) {
@@ -146,15 +138,12 @@ public class MTEExtremeEntityCrusherGui extends MTEKubaGui<MTEExtremeEntityCrush
                 "kubatech.gui.text.eec.cycle_weapons.info");
         }
     }
+
     private class VoidDamagedAndEnchantedButton extends KubaCycleButtonWidget {
 
         protected VoidDamagedAndEnchantedButton(PanelSyncManager syncManager) {
             super();
-            this.baseDynamicOverlay(
-                    () -> yesNo(
-                        voidAllDamagedAndEnchantedItems,
-                        OVERLAY_BUTTON_ON,
-                        OVERLAY_BUTTON_OFF))
+            this.baseDynamicOverlay(() -> yesNo(voidAllDamagedAndEnchantedItems, OVERLAY_BUTTON_ON, OVERLAY_BUTTON_OFF))
                 .size(18, 18)
                 .syncHandler(voidAllDamagedAndEnchantedItems.name)
                 .length(2)
@@ -163,7 +152,7 @@ public class MTEExtremeEntityCrusherGui extends MTEKubaGui<MTEExtremeEntityCrush
 
         // Todo. Check if this is intended
         private static final IDrawable OVERLAY_BUTTON_ON = new ItemDrawable(KubaFakeItemEECVoid.get(1)).asIcon();
-        private static final UITexture OVERLAY_BUTTON_OFF = getKubaUITexture16x16(
+        private static final UITexture OVERLAY_BUTTON_OFF = getKubaUITexture(
             "gui/overlay_button/machine_mode_eec_void_damaged_and_enchanted_off");
 
         private void createTooltip(RichTooltip t) {
@@ -173,24 +162,21 @@ public class MTEExtremeEntityCrusherGui extends MTEKubaGui<MTEExtremeEntityCrush
                 "kubatech.gui.text.eec.void_all_damaged.warning");
         }
     }
+
     private class allowInfernalDropButton extends KubaCycleButtonWidget {
 
         protected allowInfernalDropButton(PanelSyncManager syncManager) {
             super();
-            this.baseDynamicOverlay(
-                () -> yesNo(
-                    mIsProducingInfernalDrops,
-                    OVERLAY_BUTTON_ON,
-                    OVERLAY_BUTTON_OFF))
+            this.baseDynamicOverlay(() -> yesNo(mIsProducingInfernalDrops, OVERLAY_BUTTON_ON, OVERLAY_BUTTON_OFF))
                 .size(18, 18)
                 .syncHandler(mIsProducingInfernalDrops.name)
                 .length(2)
                 .tooltipBuilder(this::createTooltip);
         }
 
-        private static final UITexture OVERLAY_BUTTON_ON = getKubaUITexture16x16(
+        private static final UITexture OVERLAY_BUTTON_ON = getKubaUITexture(
             "gui/overlay_button/machine_mode_eec_spawn_infernals_on");
-        private static final UITexture OVERLAY_BUTTON_OFF = getKubaUITexture16x16(
+        private static final UITexture OVERLAY_BUTTON_OFF = getKubaUITexture(
             "gui/overlay_button/machine_mode_eec_spawn_infernals_off");
 
         private void createTooltip(RichTooltip t) {
@@ -200,30 +186,25 @@ public class MTEExtremeEntityCrusherGui extends MTEKubaGui<MTEExtremeEntityCrush
                 "kubatech.gui.text.eec.infernal_drop_always");
         }
     }
+
     private class RitualModeButton extends KubaCycleButtonWidget {
 
         protected RitualModeButton(PanelSyncManager syncManager) {
             super();
-            this.baseDynamicOverlay(
-                    () -> yesNo(
-                        isInRitualMode,
-                        OVERLAY_BUTTON_ON,
-                        OVERLAY_BUTTON_OFF))
+            this.baseDynamicOverlay(() -> yesNo(isInRitualMode, OVERLAY_BUTTON_ON, OVERLAY_BUTTON_OFF))
                 .size(18, 18)
                 .syncHandler(isInRitualMode.name)
                 .length(2)
                 .tooltipBuilder(this::createTooltip);
         }
 
-        private static final UITexture OVERLAY_BUTTON_ON = getKubaUITexture16x16(
+        private static final UITexture OVERLAY_BUTTON_ON = getKubaUITexture(
             "gui/overlay_button/machine_mode_eec_ritual_mode_on");
-        private static final UITexture OVERLAY_BUTTON_OFF = getKubaUITexture16x16(
+        private static final UITexture OVERLAY_BUTTON_OFF = getKubaUITexture(
             "gui/overlay_button/machine_mode_eec_ritual_mode_off");
 
         private void createTooltip(RichTooltip t) {
-            addTranslatedLockableTooltips(
-                t,
-                "kubatech.gui.text.eec.ritual_mode" + yesNo(isInRitualMode));
+            addTranslatedLockableTooltips(t, "kubatech.gui.text.eec.ritual_mode" + yesNo(isInRitualMode));
         }
     }
 
