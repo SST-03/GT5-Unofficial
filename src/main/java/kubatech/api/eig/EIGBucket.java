@@ -4,7 +4,9 @@ import static kubatech.api.utils.ItemUtils.readItemStackFromNBT;
 import static kubatech.api.utils.ItemUtils.writeItemStackToNBT;
 
 import java.util.LinkedList;
+import java.util.List;
 
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -82,6 +84,8 @@ public abstract class EIGBucket implements InventoryBucket<MTEExtremeIndustrialG
         return copied;
     }
 
+    public final @NotNull ItemStack getDisplayStack(){return getSeedStack();}
+
     /**
      * Gets the number of seeds in this bucket
      *
@@ -125,9 +129,14 @@ public abstract class EIGBucket implements InventoryBucket<MTEExtremeIndustrialG
      * @return number of seeds consumed, 0 for wrong item, -1 if it missed the support items, -2 if you tried to consume
      *         0 or less items;
      */
-    @Override
     public int tryAddSeed(@NotNull MTEExtremeIndustrialGreenhouse greenhouse, @Nullable ItemStack input, int maxConsume,
-        boolean simulate) {
+                          boolean simulate){
+        return tryAddItem(greenhouse,input,greenhouse.getStoredInputs(),maxConsume,simulate);
+    }
+
+    @Override
+    public int tryAddItem(@NotNull MTEExtremeIndustrialGreenhouse greenhouse, @Nullable ItemStack input, @Nullable List<ItemStack> extraInput, int maxConsume,
+                          boolean simulate) {
         // Abort is input if empty
         if (input == null || input.stackSize <= 0) return -2;
         // Cap max to input count
@@ -147,14 +156,16 @@ public abstract class EIGBucket implements InventoryBucket<MTEExtremeIndustrialG
         // Check if the item is found
         LinkedList<ItemStack> toConsumeFrom = new LinkedList<>();
         supportLoop: for (ItemStack supportItem : this.supportItems) {
-            for (ItemStack otherInput : greenhouse.getStoredInputs()) {
-                // filter usable inputs
-                if (otherInput == null || otherInput.stackSize <= 0) continue;
-                if (!GTUtility.areStacksEqual(supportItem, otherInput, false)) continue;
-                // update max consume again
-                maxConsume = Math.min(maxConsume, otherInput.stackSize);
-                toConsumeFrom.addLast(otherInput);
-                continue supportLoop;
+            if (extraInput != null) {
+                for (ItemStack otherInput : extraInput) {
+                    // filter usable inputs
+                    if (otherInput == null || otherInput.stackSize <= 0) continue;
+                    if (!GTUtility.areStacksEqual(supportItem, otherInput, false)) continue;
+                    // update max consume again
+                    maxConsume = Math.min(maxConsume, otherInput.stackSize);
+                    toConsumeFrom.addLast(otherInput);
+                    continue supportLoop;
+                }
             }
             // no support found, no seeds added
             return -1;
@@ -177,7 +188,6 @@ public abstract class EIGBucket implements InventoryBucket<MTEExtremeIndustrialG
      * @param toRemove The maximum amount of items to remove.
      * @return The items that were removed from the bucket. Null if the bucket is empty.
      */
-    @Override
     public ItemStack @Nullable [] tryRemoveSeed(int toRemove, boolean simulate) {
         // validate inputs
         toRemove = Math.min(this.seedCount, toRemove);
@@ -197,6 +207,11 @@ public abstract class EIGBucket implements InventoryBucket<MTEExtremeIndustrialG
             this.seedCount -= toRemove;
         }
         return ret;
+    }
+
+    @Override
+    public final ItemStack @Nullable [] tryRemoveItem(int toRemove, boolean simulate) {
+        return tryRemoveSeed(toRemove,simulate);
     }
 
     /**

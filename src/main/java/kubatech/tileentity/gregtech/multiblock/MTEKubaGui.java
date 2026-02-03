@@ -2,6 +2,7 @@ package kubatech.tileentity.gregtech.multiblock;
 
 import static com.cleanroommc.modularui.drawable.UITexture.fullImage;
 
+import kubatech.tileentity.gregtech.multiblock.modularui2.EasyBooleanSyncValue;
 import net.minecraft.util.StatCollector;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -19,17 +20,22 @@ import kubatech.tileentity.gregtech.multiblock.modularui2.LockableCycleButtonWid
 
 public abstract class MTEKubaGui<T extends KubaTechGTMultiBlockBase<T>> extends MTEMultiBlockBaseGui<T> {
 
+    public final EasyBooleanSyncValue isRunning = new EasyBooleanSyncValue("kuba_running", ()-> multiblock.mMaxProgresstime > 0,null);
     public MTEKubaGui(T multiblock) {
         super(multiblock);
+    }
+
+    @Override
+    protected void registerSyncValues(PanelSyncManager syncManager) {
+        super.registerSyncValues(syncManager);
+        isRunning.registerSyncValue(syncManager);
     }
 
     public class KubaCycleButtonWidget extends LockableCycleButtonWidget {
 
         @Override
         public boolean isLocked() {
-            // Todo. Check that can this be auto Synced? If not, try to get syncManager
-            // to run syncManager.findSyncHandler("mMaxProgresstime", IntSyncValue.class);
-            return multiblock.mMaxProgresstime > 0;
+            return isRunning.getValue();
         }
 
         protected IKey getTranslationMode() {

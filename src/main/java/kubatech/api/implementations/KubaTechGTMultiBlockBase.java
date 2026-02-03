@@ -328,9 +328,15 @@ public abstract class KubaTechGTMultiBlockBase<T extends MTEExtendedPowerMultiBl
     protected static final Function<Integer, IDrawable[]> toggleButtonBackgroundGetter = val -> new IDrawable[] {
         val == 0 ? GTUITextures.BUTTON_STANDARD : GTUITextures.BUTTON_STANDARD_PRESSED };
 
+    // mui2
     // Use Kubatech Logo instead.
     @Override
     public boolean supportsLogo() {
         return false;
+    }
+
+    // Mapiary and EIG needs to rewrite this
+    public List<ItemStack> getExtraInventory(){
+        return new ArrayList<>();
     }
 }

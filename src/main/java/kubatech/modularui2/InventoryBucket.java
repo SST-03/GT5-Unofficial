@@ -8,6 +8,8 @@ import org.jetbrains.annotations.Nullable;
 
 import kubatech.api.implementations.KubaTechGTMultiBlockBase;
 
+import java.util.List;
+
 // Most of the code is from kubatech.api.eig.EIGBucket
 public interface InventoryBucket<MTE extends KubaTechGTMultiBlockBase<MTE>> {
 
@@ -25,6 +27,8 @@ public interface InventoryBucket<MTE extends KubaTechGTMultiBlockBase<MTE>> {
      */
     String getDisplayName();
 
+    @NotNull ItemStack getDisplayStack();
+
     /**
      * Attempts to add seeds to bucket if the input is compatible
      *
@@ -35,7 +39,7 @@ public interface InventoryBucket<MTE extends KubaTechGTMultiBlockBase<MTE>> {
      * @return number of seeds consumed, 0 for wrong item, -1 if it missed the support items, -2 if you tried to consume
      *         0 or less items;
      */
-    int tryAddSeed(@NotNull MTE mte, @Nullable ItemStack input, int maxConsume, boolean simulate);
+    int tryAddItem(@NotNull MTE mte, @Nullable ItemStack input, @Nullable List<ItemStack> extraInput, int maxConsume, boolean simulate);
 
     /**
      * Attempts to remove a seed from bucket.
@@ -44,7 +48,7 @@ public interface InventoryBucket<MTE extends KubaTechGTMultiBlockBase<MTE>> {
      * @return The items that were removed from the bucket. Null if the bucket is empty or toRemove <= 0.
      */
 
-    ItemStack @Nullable [] tryRemoveSeed(int toRemove, boolean simulate);
+    ItemStack @Nullable [] tryRemoveItem(int toRemove, boolean simulate);
 
     /**
      * Returns true if the bucket can output items.

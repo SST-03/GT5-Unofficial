@@ -1,5 +1,10 @@
 package kubatech.tileentity.gregtech.multiblock;
 
+import com.cleanroommc.modularui.api.IPacketWriter;
+import com.cleanroommc.modularui.widget.EmptyWidget;
+import com.cleanroommc.modularui.widgets.DynamicSyncedWidget;
+import kubatech.tileentity.gregtech.multiblock.modularui2.KubaDisplayInvetorySyncHandler.EasyKubaDisplayInvetorySyncValue;
+import kubatech.tileentity.gregtech.multiblock.modularui2.ListWidgetWithDefaultScroll;
 import net.minecraft.item.ItemStack;
 
 import com.cleanroommc.modularui.api.widget.IWidget;
@@ -12,6 +17,7 @@ import com.cleanroommc.modularui.widgets.PagedWidget;
 import com.cleanroommc.modularui.widgets.layout.Column;
 import com.cleanroommc.modularui.widgets.layout.Flow;
 import com.cleanroommc.modularui.widgets.layout.Row;
+import com.cleanroommc.modularui.value.sync.DynamicSyncHandler;
 
 import gregtech.api.GregTechAPI;
 import gregtech.api.enums.MetaTileEntityIDs;
@@ -19,9 +25,34 @@ import kubatech.api.implementations.KubaTechGTMultiBlockBase;
 
 // for Mapiary and EIG
 public class MTEKubaExtraInventoryGui<T extends KubaTechGTMultiBlockBase<T>> extends MTEKubaGui<T> {
+    private int lastScroll;
+    private final DynamicSyncHandler notifyUpdateHandler = new DynamicSyncHandler(){
+
+        // save scroll data before executing update
+        @Override
+        public void notifyUpdate(IPacketWriter packetWriter) {
+            if (dynamicWidget.hasChildren()) {
+                IWidget child = dynamicWidget.getChildren()
+                    .get(0);
+                if (child instanceof ListWidgetWithDefaultScroll<?, ?>list) {
+                    lastScroll = list.getScrollY();
+                }
+            }
+            super.notifyUpdate(packetWriter);
+        }
+    };
+    private final DynamicSyncedWidget<?> dynamicWidget = new DynamicSyncedWidget<>().widthRel(0.95f).expanded().syncHandler(notifyUpdateHandler);
+
+    public final EasyKubaDisplayInvetorySyncValue ExtraInventory = new EasyKubaDisplayInvetorySyncValue("kuba_extrainventory", multiblock::getExtraInventory);
 
     public MTEKubaExtraInventoryGui(T multiblock) {
         super(multiblock);
+    }
+
+    @Override
+    protected void registerSyncValues(PanelSyncManager syncManager) {
+        super.registerSyncValues(syncManager);
+        ExtraInventory.registerSyncValue(syncManager);
     }
 
     @Override
@@ -53,6 +84,19 @@ public class MTEKubaExtraInventoryGui<T extends KubaTechGTMultiBlockBase<T>> ext
     }
 
     protected IWidget createExtraInventory(ModularPanel panel, PanelSyncManager syncManager) {
-        return new Row().size(getTerminalRowWidth(), getTerminalRowHeight());
+        notifyUpdateHandler.widgetProvider((pSyncManager, packet) -> {
+                if (packet == null) {
+                    return new EmptyWidget();
+                }
+                return createListArea(syncManager, pSyncManager);
+        });
+
+        return new Row().size(getTerminalRowWidth(), getTerminalRowHeight()).child(dynamicWidget);
+    }
+
+    protected IWidget createListArea(PanelSyncManager syncManager, PanelSyncManager dynamicSyncManager) {
+        ListWidgetWithDefaultScroll.FinalListWidgetWithDefaultScroll<IWidget> list = new ListWidgetWithDefaultScroll.FinalListWidgetWithDefaultScroll<>(lastScroll)
+            .size(getTerminalRowWidth(), getTerminalRowHeight());
+        return list;
     }
 }
